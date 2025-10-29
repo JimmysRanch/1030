@@ -19,6 +19,7 @@ export default function Nav() {
   const path = usePathname() || "/";
   return (
     <header className="top-nav">
+      <div className="nav-spacer" aria-hidden="true" />
       <nav className="primary-nav" aria-label="Primary">
         {items.map(it => (
           <Link
