@@ -1,7 +1,7 @@
 ---
 title: "[SECTION_TITLE]"
 slug: "[kebab-section-name]"
-status: "complete"
+status: "complete"          # complete | in-progress | draft
 owner: "Product: Me | Eng: Agent"
 routes:
   - "/[route-1]"
@@ -14,7 +14,9 @@ Explain what this section does for the app, its domain boundaries, and key succe
 
 # 2. UX & Layout Spec
 ## 2.1 Screen Map
-List pages and states. Diagram reference: ./images/layout-overview.png
+List pages and states.
+Include/link text-based diagram: ./diagrams/layout-overview.md
+
 ## 2.2 Exact Layout Details
 - Grid/breakpoints
 - Spacing scale (px/rem)
@@ -23,6 +25,8 @@ List pages and states. Diagram reference: ./images/layout-overview.png
 - Components list with props and state
 - Widget dimensions (min/max/ideal), include 16:9 notes where applicable
 - Interactive states (hover, focus, disabled, loading, empty, error)
+Include/link diagram: ./diagrams/widget-sizes.md
+
 ## 2.3 Accessibility
 Keyboard nav map, roles, ARIA, focus order, color contrast checks.
 
@@ -35,21 +39,23 @@ For each core task:
 - Side effects (realtime, notifications)
 - Error handling and retries
 - Metrics/events emitted
+Include/link diagram: ./diagrams/key-workflows.md
 
 # 4. Data & Supabase Schema
 ## 4.1 Entities & Tables
-For each table:
-- Columns with type, pk/fk, default, nullable, description
-- Indexes and why
-- RLS policies
-- Triggers/functions
-- Example rows (INSERT)
-- Example SELECT/UPSERT patterns
+Columns with type, pk/fk, default, nullable, description
+Indexes and why
+RLS policies
+Triggers/functions
+Example rows (INSERT)
+Example SELECT/UPSERT patterns
+Include/link diagram: ./diagrams/data-model.md
+
 ## 4.2 Migrations
-- Migration filename(s)
-- Diff summary
-- Safety notes
-- Verify SQL to assert state
+Migration filename(s)
+Diff summary
+Safety notes
+Verify SQL to assert state
 
 # 5. API & Integration Contracts
 - Client API surface (function signatures, inputs/outputs)
@@ -58,9 +64,9 @@ For each table:
 - Rate/limits and timeouts
 
 # 6. State Management & Caching
-- Query keys, invalidation rules
-- Local storage usage
-- Offline behavior
+Query keys, invalidation rules
+Local storage usage
+Offline behavior
 
 # 7. Error Handling & Observability
 - Error taxonomy

@@ -1,0 +1,101 @@
+{
+  "$schema": "./../../_includes/templates/SECTION_SUMMARY_SCHEMA.json",
+  "section": "appointments",
+  "title": "Appointments",
+  "routes": ["/appointments", "/appointments/waitlist"],
+  "entities": ["appointments", "appointment_waitlist"],
+  "widgets": [
+    { "name": "ScheduleMetricsCard", "width_px": 280, "height_px": 180, "breakpoint": "md" },
+    { "name": "TimelineRow", "width_px": 640, "height_px": 92, "breakpoint": "lg" },
+    { "name": "StationAppointmentCard", "width_px": 300, "height_px": 164, "breakpoint": "md" },
+    { "name": "WaitlistCard", "width_px": 300, "height_px": 176, "breakpoint": "md" }
+  ],
+  "supabase": {
+    "tables": [
+      {
+        "name": "appointments",
+        "columns": [
+          { "name": "id", "type": "uuid", "pk": true, "nullable": false, "default": "gen_random_uuid()", "description": "Primary identifier" },
+          { "name": "client_name", "type": "text", "pk": false, "nullable": false, "default": null, "description": "Owner name" },
+          { "name": "pet_name", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Pet name" },
+          { "name": "status", "type": "text", "pk": false, "nullable": false, "default": "scheduled", "description": "Lifecycle status" },
+          { "name": "start_at", "type": "timestamptz", "pk": false, "nullable": false, "default": null, "description": "Scheduled start" },
+          { "name": "end_at", "type": "timestamptz", "pk": false, "nullable": true, "default": null, "description": "Scheduled end" },
+          { "name": "services", "type": "jsonb", "pk": false, "nullable": false, "default": "[]", "description": "Array of service labels" },
+          { "name": "staff_name", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Assigned stylist" },
+          { "name": "room", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Station or room" },
+          { "name": "total_due", "type": "numeric(10,2)", "pk": false, "nullable": true, "default": null, "description": "Projected invoice" },
+          { "name": "deposit_due", "type": "numeric(10,2)", "pk": false, "nullable": true, "default": null, "description": "Deposit amount" },
+          { "name": "check_in_at", "type": "timestamptz", "pk": false, "nullable": true, "default": null, "description": "Actual check-in" },
+          { "name": "check_out_at", "type": "timestamptz", "pk": false, "nullable": true, "default": null, "description": "Actual checkout" },
+          { "name": "source", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Booking source" },
+          { "name": "notes", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Internal notes" },
+          { "name": "created_at", "type": "timestamptz", "pk": false, "nullable": false, "default": "now()", "description": "Insert timestamp" },
+          { "name": "updated_at", "type": "timestamptz", "pk": false, "nullable": false, "default": "now()", "description": "Update timestamp" }
+        ],
+        "indexes": [
+          "appointments_start_idx",
+          "appointments_status_idx",
+          "appointments_checkin_idx"
+        ],
+        "rls": [
+          "policy_manager_full",
+          "policy_front_desk_update_status",
+          "policy_stylist_select_self"
+        ],
+        "triggers": [
+          "set_updated_at",
+          "set_checkout_timestamp"
+        ]
+      },
+      {
+        "name": "appointment_waitlist",
+        "columns": [
+          { "name": "id", "type": "uuid", "pk": true, "nullable": false, "default": "gen_random_uuid()", "description": "Primary identifier" },
+          { "name": "client_name", "type": "text", "pk": false, "nullable": false, "default": null, "description": "Owner name" },
+          { "name": "pet_name", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Pet name" },
+          { "name": "service", "type": "text", "pk": false, "nullable": false, "default": null, "description": "Requested service" },
+          { "name": "preferred_start", "type": "timestamptz", "pk": false, "nullable": true, "default": null, "description": "Desired start" },
+          { "name": "channel", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Request channel" },
+          { "name": "priority", "type": "text", "pk": false, "nullable": false, "default": "standard", "description": "Urgency tier" },
+          { "name": "status", "type": "text", "pk": false, "nullable": false, "default": "waiting", "description": "Queue status" },
+          { "name": "requested_at", "type": "timestamptz", "pk": false, "nullable": false, "default": "now()", "description": "Request timestamp" },
+          { "name": "notes", "type": "text", "pk": false, "nullable": true, "default": null, "description": "Internal notes" }
+        ],
+        "indexes": [
+          "appointment_waitlist_priority_idx",
+          "appointment_waitlist_status_idx",
+          "appointment_waitlist_requested_idx"
+        ],
+        "rls": [
+          "policy_manager_full",
+          "policy_front_desk_manage_waitlist",
+          "policy_stylist_select_assigned"
+        ],
+        "triggers": [
+          "set_updated_at",
+          "normalize_priority"
+        ]
+      }
+    ],
+    "migrations": ["20240614091500_appointments.sql"]
+  },
+  "workflows": [
+    { "name": "Check In Appointment", "happy_path_steps": 3, "writes": ["appointments"] },
+    { "name": "Complete Appointment", "happy_path_steps": 4, "writes": ["appointments"] },
+    { "name": "Promote Waitlist", "happy_path_steps": 5, "writes": ["appointment_waitlist", "appointments"] }
+  ],
+  "perf_budget": { "lcp_ms": 2200, "query_ms_p95": 110 },
+  "a11y": { "contrast_min": 4.5, "keyboard_support": true },
+  "swift": {
+    "views": ["AppointmentsView", "TimelineRowView", "WaitlistListView"],
+    "state": ["ObservableObject: AppointmentsStore", "ObservableObject: WaitlistStore"],
+    "models": ["Appointment", "WaitlistEntry"],
+    "notes": [
+      "Use async let to fetch appointments and waitlist concurrently",
+      "Render status pills with linear gradients matching brand colors",
+      "Persist last fetch timestamp to show stale badge when offline"
+    ]
+  },
+  "updated_at": "2025-10-29T21:30:00Z"
+}

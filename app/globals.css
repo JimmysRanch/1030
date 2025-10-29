@@ -1,15 +1,35 @@
 :root { --bg: #0f1115; --panel:#161a22; --text:#e6e8ee; --muted:#9aa4b2; --brand:#4ea1ff; }
 * { box-sizing: border-box; }
-html, body { padding:0; margin:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Inter, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'; }
+html, body { padding:0; margin:0; background:var(--bg); color:var(--text); font-family: ui-sans-serif, system-ui, -apple-system,
+ Segoe UI, Roboto, Inter, Arial, 'Apple Color Emoji', 'Segoe UI Emoji'; }
+body { min-height:100vh; }
 a { color: inherit; text-decoration: none; }
-.wrap { display:flex; min-height:100vh; }
-.nav { width:260px; background:var(--panel); padding:20px; position:sticky; top:0; height:100vh; }
-.logo { font-weight:800; letter-spacing:0.5px; margin-bottom:16px; }
-.group { margin-top:14px; margin-bottom:8px; font-size:12px; color:var(--muted); text-transform:uppercase; }
-.link { display:block; padding:10px 12px; border-radius:8px; color:var(--text); margin-bottom:6px; }
-.link:hover { background:#1f2430; }
-.active { background:#1f2430; outline:1px solid #2a3140; }
-.content { flex:1; padding:24px; }
+button { font: inherit; color: inherit; }
+.app-shell { min-height:100vh; display:flex; flex-direction:column; background:var(--bg); }
+.top-nav { position:sticky; top:0; z-index:20; display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:16px; padding:6px 20px;
+  background:rgba(18,22,32,0.92); border-bottom:1px solid #1f2430; box-shadow:0 12px 36px rgba(5,9,18,0.45); backdrop-filter:blur(16px); }
+.nav-spacer { height:1px; }
+.primary-nav { display:flex; align-items:center; gap:4px; justify-content:center; }
+.nav-link { padding:10px 14px; border-radius:999px; font-size:14px; color:var(--muted); background:rgba(20,24,34,0.75);
+ transition:all 0.2s ease; border:1px solid rgba(42,49,64,0.4); letter-spacing:0.01em; }
+.nav-link:hover { color:var(--text); background:#1f2430; border-color:rgba(78,161,255,0.35); }
+.nav-link.active { background:var(--brand); color:#051222; font-weight:600; border-color:transparent; box-shadow:0 12px 28px rgba(78,161,255,0.35); }
+.top-actions { display:flex; align-items:center; gap:10px; justify-self:end; }
+.user-pill { display:flex; align-items:center; gap:6px; padding:2px 8px; border-radius:999px; border:1px solid #2a3140;
+ background:rgba(12,15,22,0.92); box-shadow:0 10px 24px rgba(5,9,18,0.45); }
+.user-copy { display:flex; flex-direction:column; line-height:1.15; }
+.user-name { font-size:12px; font-weight:600; }
+.user-role { font-size:10px; color:var(--muted); letter-spacing:0.14em; text-transform:uppercase; }
+.content { flex:1; width:100%; padding:32px; display:flex; flex-direction:column; gap:32px; }
+
+@media (max-width: 960px) {
+  .top-nav { display:flex; flex-direction:column; align-items:flex-start; gap:12px; padding:8px 16px; }
+  .nav-spacer { display:none; }
+  .primary-nav { order:2; width:100%; overflow:auto; padding-bottom:2px; justify-content:flex-start; }
+  .primary-nav::-webkit-scrollbar { height:6px; }
+  .top-actions { order:1; width:100%; justify-content:flex-start; }
+  .content { padding:24px 20px; }
+}
 
 .page { display:flex; flex-direction:column; gap:24px; }
 .page-header { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; }
@@ -109,3 +129,65 @@ a { color: inherit; text-decoration: none; }
 .check { font-size:14px; }
 .onboarding-notes { margin:0; font-size:12px; color:#aabce0; }
 .onboarding-empty { padding:48px; text-align:center; color:var(--muted); border:1px dashed rgba(78,161,255,0.3); border-radius:18px; background:rgba(14,18,26,0.7); }
+.page-header-meta { display:flex; flex-direction:column; align-items:flex-end; gap:4px; font-size:12px; color:var(--muted); }
+.page-header-date { font-size:14px; font-weight:600; color:#d1d6e3; letter-spacing:0.02em; }
+.page-header-timezone { font-size:11px; letter-spacing:0.12em; text-transform:uppercase; color:var(--muted); }
+
+.appointments-tabs { overflow:auto; padding-bottom:6px; }
+.appointments-tabs::-webkit-scrollbar { height:6px; }
+
+.timeline-list { display:flex; flex-direction:column; gap:12px; }
+.timeline-row { display:grid; grid-template-columns:120px 1fr auto; gap:18px; align-items:center; background:rgba(12,16,24,0.88); border:1px solid #1a2030; border-radius:18px; padding:14px 18px; box-shadow:0 18px 40px rgba(5,9,18,0.4); }
+.timeline-time { display:flex; flex-direction:column; gap:4px; font-weight:600; font-size:15px; }
+.timeline-time span:last-child { font-size:12px; color:var(--muted); font-weight:500; }
+.timeline-body { display:flex; flex-direction:column; gap:6px; }
+.timeline-primary { display:flex; gap:10px; font-weight:600; font-size:15px; }
+.timeline-client { color:#e6e8ee; }
+.timeline-pet { color:#9fb2d9; letter-spacing:0.05em; text-transform:uppercase; font-size:11px; }
+.timeline-services { font-size:13px; color:#d1d6e3; }
+.timeline-meta { display:flex; flex-wrap:wrap; gap:12px; font-size:12px; color:var(--muted); }
+.timeline-status { display:flex; justify-content:flex-end; }
+.timeline-empty { padding:48px; text-align:center; color:var(--muted); border:1px dashed rgba(78,161,255,0.3); border-radius:18px; background:rgba(14,18,26,0.7); }
+
+.appointments-board { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:18px; }
+.appointments-column { background:rgba(15,19,28,0.92); border-radius:20px; border:1px solid #1f2430; padding:16px; display:flex; flex-direction:column; gap:14px; min-height:280px; }
+.appointments-column-header { display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:0.08em; font-size:12px; color:var(--muted); }
+.appointments-column-header h3 { margin:0; font-size:16px; text-transform:none; letter-spacing:0; color:#e6e8ee; }
+.appointments-column-header span { font-weight:600; color:#9fb2d9; }
+.appointments-column-body { display:flex; flex-direction:column; gap:12px; flex:1; }
+.appointment-card { background:rgba(12,16,24,0.88); border-radius:16px; border:1px solid #1a2030; padding:14px; display:flex; flex-direction:column; gap:10px; box-shadow:0 18px 40px rgba(5,9,18,0.38); }
+.appointment-header { display:flex; justify-content:space-between; align-items:center; gap:10px; }
+.appointment-client { font-size:15px; font-weight:600; }
+.appointment-pet { font-size:12px; color:#9fb2d9; letter-spacing:0.08em; text-transform:uppercase; }
+.appointment-meta { display:flex; flex-direction:column; gap:4px; font-size:12px; color:var(--muted); }
+.appointment-time { font-size:13px; font-weight:500; color:#d1d6e3; }
+.appointment-status { display:flex; justify-content:flex-start; }
+.appointments-empty { margin:0; padding:32px 12px; text-align:center; color:var(--muted); border:1px dashed rgba(78,161,255,0.24); border-radius:14px; background:rgba(14,18,26,0.7); }
+
+.waitlist-preview { display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:16px; }
+.waitlist-card { background:rgba(12,16,24,0.9); border-radius:18px; border:1px solid #1a2030; padding:16px; display:flex; flex-direction:column; gap:12px; box-shadow:0 18px 40px rgba(5,9,18,0.35); }
+.waitlist-header { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.waitlist-header h3 { margin:0; font-size:16px; }
+.waitlist-header p { margin:4px 0 0; font-size:12px; color:#9fb2d9; }
+.waitlist-meta { display:flex; flex-wrap:wrap; gap:10px; font-size:12px; color:var(--muted); }
+.waitlist-footer { display:flex; flex-wrap:wrap; gap:10px; font-size:12px; color:#9fb2d9; }
+.waitlist-notes { margin:0; font-size:12px; color:#c8d6f2; }
+
+.waitlist-groups { display:grid; grid-template-columns:repeat(auto-fit, minmax(280px,1fr)); gap:20px; }
+.waitlist-group { background:rgba(15,19,28,0.92); border-radius:20px; border:1px solid #1f2430; padding:16px; display:flex; flex-direction:column; gap:14px; }
+.waitlist-group-header { display:flex; justify-content:space-between; align-items:center; text-transform:uppercase; letter-spacing:0.08em; font-size:12px; color:var(--muted); }
+.waitlist-group-header h3 { margin:0; font-size:14px; text-transform:none; letter-spacing:0; color:#e6e8ee; }
+.waitlist-group-header span { font-weight:600; color:#9fb2d9; }
+.waitlist-grid { display:flex; flex-direction:column; gap:12px; }
+
+@media (max-width: 900px) {
+  .timeline-row { grid-template-columns:1fr; align-items:flex-start; }
+  .timeline-status { justify-content:flex-start; }
+  .timeline-time { flex-direction:row; gap:10px; }
+}
+
+@media (max-width: 640px) {
+  .appointments-board { grid-template-columns:1fr; }
+  .waitlist-preview { grid-template-columns:1fr; }
+  .waitlist-groups { grid-template-columns:1fr; }
+}
