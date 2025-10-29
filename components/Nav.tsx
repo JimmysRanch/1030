@@ -32,9 +32,6 @@ export default function Nav() {
       </nav>
       <div className="top-actions">
         <div className="user-pill">
-          <span className="user-avatar" aria-hidden>
-            JD
-          </span>
           <div className="user-copy">
             <span className="user-name">Jordan Dean</span>
             <span className="user-role">Manager</span>
