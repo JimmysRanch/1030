@@ -1,19 +1,17 @@
-import { supabaseServer } from "./supabase/server";
+import { supabaseServer } from "@/lib/supabase/server";
 
-export async function currentOrgId(): Promise<string | null> {
+type ProfileOrgRow = { org_id: string | null };
+
+export async function getCurrentOrgId(): Promise<string | null> {
   const supabase = supabaseServer();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
-  if (!user) return null;
-
+  // Typed select + maybeSingle prevents data from being inferred as never.
   const { data, error } = await supabase
     .from("profiles")
     .select("org_id")
-    .eq("user_id", user.id)
-    .single();
+    .returns<ProfileOrgRow>()
+    .maybeSingle();
 
   if (error || !data) return null;
-  return data.org_id;
+  return (data as ProfileOrgRow).org_id;
 }
