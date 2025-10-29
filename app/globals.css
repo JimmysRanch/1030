@@ -10,7 +10,7 @@ button { font: inherit; color: inherit; }
   background:rgba(18,22,32,0.92); border-bottom:1px solid #1f2430; box-shadow:0 12px 36px rgba(5,9,18,0.45); backdrop-filter:blur(16px); }
 .nav-spacer { height:1px; }
 .primary-nav { display:flex; align-items:center; gap:4px; justify-content:center; }
-.nav-link { padding:8px 14px; border-radius:999px; font-size:14px; color:var(--muted); background:rgba(20,24,34,0.75);
+.nav-link { padding:10px 14px; border-radius:999px; font-size:14px; color:var(--muted); background:rgba(20,24,34,0.75);
  transition:all 0.2s ease; border:1px solid rgba(42,49,64,0.4); letter-spacing:0.01em; }
 .nav-link:hover { color:var(--text); background:#1f2430; border-color:rgba(78,161,255,0.35); }
 .nav-link.active { background:var(--brand); color:#051222; font-weight:600; border-color:transparent; box-shadow:0 12px 28px rgba(78,161,255,0.35); }
