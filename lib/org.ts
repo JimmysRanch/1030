@@ -12,7 +12,7 @@ export async function currentOrgId(): Promise<string | null> {
     .from("profiles")
     .select("org_id")
     .eq("user_id", user.id)
-    .single();
+    .maybeSingle<{ org_id: string }>();
 
   if (error || !data) return null;
   return data.org_id;
