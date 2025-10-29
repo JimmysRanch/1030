@@ -1,0 +1,132 @@
+{
+  "$schema": "./../../_includes/templates/SECTION_SUMMARY_SCHEMA.json",
+  "section": "staff",
+  "title": "Staff Operations",
+  "routes": ["/staff", "/staff/schedule", "/staff/payroll", "/staff/performance", "/staff/onboarding"],
+  "entities": [
+    "staff_directory",
+    "staff_schedule",
+    "staff_payroll",
+    "staff_performance_reviews",
+    "staff_onboarding_checklists"
+  ],
+  "widgets": [
+    { "name": "RosterMetricsCard", "width_px": 320, "height_px": 188, "breakpoint": "md" },
+    { "name": "RosterTable", "width_px": 960, "height_px": 480, "breakpoint": "lg" },
+    { "name": "ShiftCard", "width_px": 280, "height_px": 240, "breakpoint": "md" },
+    { "name": "PerformanceCard", "width_px": 320, "height_px": 320, "breakpoint": "md" },
+    { "name": "OnboardingCard", "width_px": 320, "height_px": 320, "breakpoint": "md" }
+  ],
+  "supabase": {
+    "tables": [
+      {
+        "name": "staff_directory",
+        "columns": [
+          { "name": "id", "type": "uuid", "pk": true, "nullable": false, "default": "gen_random_uuid()" },
+          { "name": "full_name", "type": "text", "pk": false, "nullable": false, "default": null },
+          { "name": "role", "type": "text", "pk": false, "nullable": true, "default": null },
+          { "name": "status", "type": "text", "pk": false, "nullable": false, "default": "active" },
+          { "name": "specialties", "type": "text[]", "pk": false, "nullable": false, "default": "{}" },
+          { "name": "certifications", "type": "jsonb", "pk": false, "nullable": false, "default": "[]" },
+          { "name": "start_date", "type": "date", "pk": false, "nullable": true, "default": null },
+          { "name": "next_shift_at", "type": "timestamptz", "pk": false, "nullable": true, "default": null }
+        ],
+        "indexes": ["staff_directory_status_idx", "staff_directory_next_shift_idx"],
+        "rls": ["manager_select", "service_full_access"],
+        "triggers": ["set_updated_at"]
+      },
+      {
+        "name": "staff_schedule",
+        "columns": [
+          { "name": "id", "type": "uuid", "pk": true, "nullable": false, "default": "gen_random_uuid()" },
+          { "name": "staff_id", "type": "uuid", "pk": false, "nullable": false, "default": null },
+          { "name": "status", "type": "text", "pk": false, "nullable": false, "default": "scheduled" },
+          { "name": "start", "type": "timestamptz", "pk": false, "nullable": false, "default": null },
+          { "name": "end", "type": "timestamptz", "pk": false, "nullable": true, "default": null }
+        ],
+        "indexes": ["staff_schedule_start_idx", "staff_schedule_status_idx"],
+        "rls": ["manager_rw", "staff_self_select", "service_full_access"],
+        "triggers": ["ensure_shift_end_after_start"]
+      },
+      {
+        "name": "staff_payroll",
+        "columns": [
+          { "name": "id", "type": "uuid", "pk": true, "nullable": false, "default": "gen_random_uuid()" },
+          { "name": "staff_id", "type": "uuid", "pk": false, "nullable": false, "default": null },
+          { "name": "period_start", "type": "date", "pk": false, "nullable": false, "default": null },
+          { "name": "period_end", "type": "date", "pk": false, "nullable": false, "default": null },
+          { "name": "gross_pay", "type": "numeric", "pk": false, "nullable": false, "default": null },
+          { "name": "status", "type": "text", "pk": false, "nullable": false, "default": "pending" },
+          { "name": "processed_at", "type": "timestamptz", "pk": false, "nullable": true, "default": null }
+        ],
+        "indexes": ["staff_payroll_period_idx", "staff_payroll_status_idx"],
+        "rls": ["manager_rw", "service_full_access"],
+        "triggers": ["set_processed_timestamp"]
+      },
+      {
+        "name": "staff_performance_reviews",
+        "columns": [
+          { "name": "id", "type": "uuid", "pk": true, "nullable": false, "default": "gen_random_uuid()" },
+          { "name": "staff_id", "type": "uuid", "pk": false, "nullable": false, "default": null },
+          { "name": "avg_rating", "type": "numeric", "pk": false, "nullable": true, "default": null },
+          { "name": "review_count", "type": "integer", "pk": false, "nullable": false, "default": "0" },
+          { "name": "goals", "type": "jsonb", "pk": false, "nullable": false, "default": "[]" }
+        ],
+        "indexes": ["staff_performance_staff_idx"],
+        "rls": ["manager_rw", "staff_self_select", "service_full_access"],
+        "triggers": ["validate_goals_payload"]
+      },
+      {
+        "name": "staff_onboarding_checklists",
+        "columns": [
+          { "name": "id", "type": "uuid", "pk": true, "nullable": false, "default": "gen_random_uuid()" },
+          { "name": "staff_id", "type": "uuid", "pk": false, "nullable": false, "default": null },
+          { "name": "status", "type": "text", "pk": false, "nullable": false, "default": "Onboarding" },
+          { "name": "checklist", "type": "jsonb", "pk": false, "nullable": false, "default": "[]" },
+          { "name": "mentor", "type": "text", "pk": false, "nullable": true, "default": null }
+        ],
+        "indexes": ["staff_onboarding_status_idx"],
+        "rls": ["manager_rw", "mentor_select", "service_full_access"],
+        "triggers": ["ensure_checklist_json"]
+      }
+    ],
+    "migrations": ["20240613094500_staff_module.sql"]
+  },
+  "workflows": [
+    { "name": "Review Roster", "happy_path_steps": 3, "writes": [] },
+    { "name": "Plan Shifts", "happy_path_steps": 3, "writes": ["staff_schedule"] },
+    { "name": "Reconcile Payroll", "happy_path_steps": 3, "writes": ["staff_payroll"] },
+    { "name": "Track Performance", "happy_path_steps": 3, "writes": ["staff_performance_reviews"] },
+    { "name": "Manage Onboarding", "happy_path_steps": 3, "writes": ["staff_onboarding_checklists"] }
+  ],
+  "perf_budget": { "lcp_ms": 2000, "query_ms_p95": 120 },
+  "a11y": { "contrast_min": 4.5, "keyboard_support": true },
+  "swift": {
+    "views": [
+      "StaffTabView",
+      "RosterView",
+      "ScheduleView",
+      "PayrollView",
+      "PerformanceView",
+      "OnboardingView"
+    ],
+    "state": [
+      "ObservableObject: StaffRosterStore",
+      "ObservableObject: StaffScheduleStore",
+      "ObservableObject: StaffPayrollStore"
+    ],
+    "models": [
+      "StaffRosterMember",
+      "StaffShift",
+      "StaffPayrollRow",
+      "StaffPerformanceRow",
+      "StaffOnboardingRow"
+    ],
+    "notes": [
+      "Use adaptive LazyVGrid for cards",
+      "Decode Supabase timestamptz via ISO8601DateFormatter",
+      "Propagate errors with @MainActor async functions"
+    ]
+  },
+  "updated_at": "2025-10-29T18:05:55Z"
+}

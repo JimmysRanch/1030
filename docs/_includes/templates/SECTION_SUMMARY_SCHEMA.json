@@ -1,0 +1,154 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Section summary schema",
+  "type": "object",
+  "required": [
+    "section",
+    "title",
+    "routes",
+    "entities",
+    "widgets",
+    "supabase",
+    "workflows",
+    "perf_budget",
+    "a11y",
+    "updated_at"
+  ],
+  "properties": {
+    "section": { "type": "string", "pattern": "^[a-z0-9-]+$" },
+    "title": { "type": "string", "minLength": 1 },
+    "routes": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "pattern": "^/" }
+    },
+    "entities": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "widgets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "width_px", "height_px", "breakpoint"],
+        "properties": {
+          "name": { "type": "string" },
+          "width_px": { "type": "number", "minimum": 0 },
+          "height_px": { "type": "number", "minimum": 0 },
+          "breakpoint": { "type": "string" }
+        },
+        "additionalProperties": false
+      }
+    },
+    "supabase": {
+      "type": "object",
+      "required": ["tables", "migrations"],
+      "properties": {
+        "tables": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "columns", "indexes", "rls", "triggers"],
+            "properties": {
+              "name": { "type": "string" },
+              "columns": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["name", "type", "pk", "nullable"],
+                  "properties": {
+                    "name": { "type": "string" },
+                    "type": { "type": "string" },
+                    "pk": { "type": "boolean" },
+                    "nullable": { "type": "boolean" },
+                    "default": { "type": ["string", "null"] },
+                    "description": { "type": ["string", "null"] }
+                  },
+                  "additionalProperties": false
+                }
+              },
+              "indexes": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "rls": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "triggers": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "additionalProperties": false
+          }
+        },
+        "migrations": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "workflows": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "happy_path_steps", "writes"],
+        "properties": {
+          "name": { "type": "string" },
+          "happy_path_steps": { "type": "number", "minimum": 0 },
+          "writes": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "perf_budget": {
+      "type": "object",
+      "required": ["lcp_ms", "query_ms_p95"],
+      "properties": {
+        "lcp_ms": { "type": "number", "minimum": 0 },
+        "query_ms_p95": { "type": "number", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "a11y": {
+      "type": "object",
+      "required": ["contrast_min", "keyboard_support"],
+      "properties": {
+        "contrast_min": { "type": "number", "minimum": 0 },
+        "keyboard_support": { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "swift": {
+      "type": "object",
+      "required": ["views", "state", "models", "notes"],
+      "properties": {
+        "views": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "state": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "models": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "notes": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

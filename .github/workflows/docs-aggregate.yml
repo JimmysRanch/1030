@@ -1,0 +1,38 @@
+name: Aggregate documentation index
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'docs/**'
+      - 'scripts/build-master-doc.ts'
+      - 'tsconfig.docs.json'
+
+jobs:
+  build-master:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Compile docs tools
+        run: npx tsc --project tsconfig.docs.json
+
+      - name: Rebuild Master-Master index
+        run: node dist/scripts/build-master-doc.js
+
+      - name: Commit updated docs
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: 'chore(docs): update Master-Master index'
+          file_pattern: docs/MASTER_MASTER.md
