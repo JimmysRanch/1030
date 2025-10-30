@@ -9,8 +9,7 @@ export async function getCurrentOrgId(): Promise<string | null> {
   const { data, error } = await supabase
     .from("profiles")
     .select("org_id")
-    .returns<ProfileOrgRow>()
-    .maybeSingle();
+    .maybeSingle<ProfileOrgRow>();
 
   if (error || !data) return null;
   return data.org_id;
