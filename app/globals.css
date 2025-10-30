@@ -55,6 +55,49 @@ button { font: inherit; color: inherit; }
 .metrics-active::after { background:radial-gradient(circle at center, rgba(79,255,176,0.25), transparent 65%); }
 .metrics-leave::after { background:radial-gradient(circle at center, rgba(255,153,102,0.28), transparent 65%); }
 .metrics-onboarding::after { background:radial-gradient(circle at center, rgba(255,214,102,0.28), transparent 65%); }
+.metrics-figure { display:flex; align-items:flex-start; justify-content:space-between; gap:12px; }
+.metric-chart { width:118px; height:44px; }
+.metric-chart-line { stroke:url(#dashboard-chart-gradient); stroke:#4ea1ff; opacity:0.75; }
+.metric-chart-dot { fill:#4ea1ff; opacity:0.9; }
+.metric-streak { display:flex; align-items:flex-end; gap:4px; padding-top:6px; }
+.metric-streak-bar { flex:1; height:36px; border-radius:999px; background:rgba(78,161,255,0.12); border:1px solid rgba(78,161,255,0.16); }
+.metric-streak-bar-full { background:linear-gradient(180deg, rgba(78,161,255,0.4), rgba(78,161,255,0.1)); }
+.dashboard { gap:32px; }
+.dashboard-stack { display:flex; flex-direction:column; gap:28px; }
+.dashboard-metrics { grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); }
+.dashboard-panels { display:grid; grid-template-columns:minmax(0, 2.1fr) minmax(0, 1fr); gap:22px; }
+
+.messages-panel .panel-header { align-items:center; }
+.ghost-button { background:rgba(14,18,26,0.8); border:1px solid #273044; color:#9fb2d9; border-radius:999px; padding:8px 16px; font-size:12px; letter-spacing:0.08em; text-transform:uppercase; cursor:pointer; transition:all 0.2s ease; }
+.ghost-button:hover { border-color:rgba(78,161,255,0.4); color:#e6e8ee; box-shadow:0 12px 28px rgba(5,9,18,0.4); }
+.message-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px; }
+.message-item { display:flex; gap:14px; background:rgba(12,16,24,0.88); border-radius:18px; padding:16px; border:1px solid #1a2030; box-shadow:0 18px 40px rgba(5,9,18,0.35); }
+.message-avatar { width:48px; height:48px; border-radius:16px; display:flex; align-items:center; justify-content:center; font-weight:700; letter-spacing:0.06em; background:linear-gradient(150deg, rgba(78,161,255,0.4), rgba(78,161,255,0.12)); color:#0b1726; }
+.message-copy { display:flex; flex-direction:column; gap:6px; flex:1; }
+.message-header { display:flex; justify-content:space-between; align-items:center; gap:12px; font-size:14px; }
+.message-name { font-weight:600; letter-spacing:0.01em; }
+.message-time { font-size:12px; color:#7c89a3; }
+.message-title { font-size:14px; font-weight:600; color:#e6e8ee; }
+.message-snippet { margin:0; font-size:13px; color:#aabce0; }
+.message-empty { text-align:center; padding:24px 12px; color:#9fb2d9; background:rgba(14,18,26,0.7); border-radius:16px; border:1px dashed rgba(78,161,255,0.24); }
+
+.empty-state { display:flex; flex-direction:column; align-items:center; gap:12px; padding:36px 16px; text-align:center; color:#9aa4b2; background:rgba(14,18,26,0.75); border-radius:20px; border:1px dashed rgba(78,161,255,0.24); }
+.empty-ring { width:72px; height:72px; border-radius:50%; border:2px dashed rgba(78,161,255,0.28); display:flex; align-items:center; justify-content:center; }
+.empty-ring-inner { display:block; width:24px; height:24px; border-radius:50%; background:linear-gradient(160deg, rgba(78,161,255,0.45), rgba(78,161,255,0.1)); box-shadow:0 0 18px rgba(78,161,255,0.35); }
+.empty-state p { margin:0; font-size:15px; font-weight:600; color:#d1d6e3; }
+.empty-subcopy { font-size:12px; color:#7c89a3; }
+
+.activity-panel .empty-state { min-height:180px; }
+
+@media (max-width: 1200px) {
+  .dashboard-panels { grid-template-columns:1fr; }
+}
+
+@media (max-width: 720px) {
+  .dashboard-metrics { grid-template-columns:1fr; }
+  .message-item { flex-direction:column; }
+  .message-header { align-items:flex-start; }
+}
 
 .panel { background:rgba(17,21,29,0.88); border-radius:24px; padding:22px; border:1px solid #1f2430; box-shadow:0 28px 60px rgba(5,9,18,0.45); }
 .panel-header { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; margin-bottom:18px; }
