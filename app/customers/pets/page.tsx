@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import type { FormEvent } from "react";
+import type { FormEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 
 import { clientProfiles } from "./data";
 
@@ -12,14 +13,6 @@ type ClientWithPets = {
   client: Client;
   displayPets: Client["pets"];
 };
-
-function getInitials(name: string) {
-  const parts = name.split(" ").filter(Boolean);
-  if (parts.length === 1) {
-    return parts[0]?.slice(0, 2).toUpperCase() ?? "";
-  }
-  return `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase();
-}
 
 const totalClients = clientProfiles.length;
 const totalPets = clientProfiles.reduce((count, client) => count + client.pets.length, 0);
@@ -84,10 +77,14 @@ const summaryMetrics = [
 
 function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [petSections, setPetSections] = useState<number[]>([0]);
+  const [referralSource, setReferralSource] = useState<string>("");
+  const [referralOther, setReferralOther] = useState<string>("");
 
   useEffect(() => {
     if (open) {
       setPetSections([0]);
+      setReferralSource("");
+      setReferralOther("");
     }
   }, [open]);
 
@@ -154,7 +151,9 @@ function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => voi
                 <span>Phone Number</span>
                 <input type="tel" placeholder="(555) 123-4567" />
               </label>
-              <label className="form-span-2">
+            </div>
+            <div className="form-grid address-grid">
+              <label>
                 <span>Street Address</span>
                 <input placeholder="123 Main St" />
               </label>
@@ -170,6 +169,47 @@ function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => voi
                 <span>ZIP Code</span>
                 <input placeholder="ZIP" />
               </label>
+            </div>
+            <div className="form-grid">
+              <div className="form-field-group form-span-2 referral-group">
+                <span>How did you hear about us?</span>
+                <div className="toggle-group referral-options">
+                  {[
+                    { label: "Facebook", value: "facebook" },
+                    { label: "Google", value: "google" },
+                    { label: "Nextdoor", value: "nextdoor" },
+                    { label: "A friend", value: "friend" },
+                    { label: "Other", value: "other" },
+                  ].map(option => (
+                    <label key={option.value}>
+                      <input
+                        type="radio"
+                        name="referral-source"
+                        value={option.value}
+                        checked={referralSource === option.value}
+                        onChange={event => {
+                          const value = event.target.value;
+                          setReferralSource(value);
+                          if (value !== "other") {
+                            setReferralOther("");
+                          }
+                        }}
+                      />
+                      <span>{option.label}</span>
+                    </label>
+                  ))}
+                </div>
+                {referralSource === "other" ? (
+                  <label className="referral-other">
+                    <span className="sr-only">Custom referral source</span>
+                    <input
+                      placeholder="Let us know where you heard about us"
+                      value={referralOther}
+                      onChange={event => setReferralOther(event.target.value)}
+                    />
+                  </label>
+                ) : null}
+              </div>
             </div>
           </section>
 
@@ -257,6 +297,7 @@ function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => voi
 export default function ClientsAndPetsPage() {
   const [query, setQuery] = useState("");
   const [formOpen, setFormOpen] = useState(false);
+  const router = useRouter();
 
   const filteredClients = useMemo<ClientWithPets[]>(() => {
     const normalizedQuery = query.trim().toLowerCase();
@@ -328,29 +369,38 @@ export default function ClientsAndPetsPage() {
 
           <ul className="client-roster-list" role="list">
             {filteredClients.map(({ client, displayPets }) => (
-              <li key={client.id} className="client-roster-item">
+              <li
+                key={client.id}
+                className="client-roster-item"
+                role="button"
+                tabIndex={0}
+                aria-label={`View ${client.name} profile`}
+                onClick={() => router.push(`/customers/${client.slug}`)}
+                onKeyDown={(event: ReactKeyboardEvent<HTMLLIElement>) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    router.push(`/customers/${client.slug}`);
+                  }
+                }}
+              >
                 <div className="client-row">
                   <div className="client-row-primary">
-                    <span className="avatar client-avatar" aria-hidden="true">
-                      {getInitials(client.name)}
-                    </span>
                     <div className="client-row-copy">
-                      <Link href={`/customers/${client.slug}`} className="client-row-name">
-                        {client.name}
-                      </Link>
+                      <span className="client-row-name">{client.name}</span>
                       <p className="client-row-meta">
                         {client.stats.totalVisits} visits • Member since {client.membershipSince}
                       </p>
                     </div>
                   </div>
-                  <div className="client-row-financials">
-                    <span className="client-row-value">{client.stats.lifetimeValue}</span>
-                    <span className="client-row-sub">Avg {client.stats.averageSpend}</span>
-                  </div>
                 </div>
                 <div className="client-row-pets" aria-label={`Pets for ${client.name}`}>
                   {displayPets.map(pet => (
-                    <Link key={pet.id} href={`/customers/${client.slug}#${pet.id}`} className="pet-chip">
+                    <Link
+                      key={pet.id}
+                      href={`/customers/${client.slug}#${pet.id}`}
+                      className="pet-chip"
+                      onClick={event => event.stopPropagation()}
+                    >
                       <span className="pet-chip-name">{pet.name}</span>
                       <span className="pet-chip-meta">{pet.plan}</span>
                     </Link>
