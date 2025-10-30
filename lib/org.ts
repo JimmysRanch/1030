@@ -13,5 +13,5 @@ export async function getCurrentOrgId(): Promise<string | null> {
     .maybeSingle();
 
   if (error || !data) return null;
-  return (data as ProfileOrgRow).org_id;
+  return data.org_id;
 }
