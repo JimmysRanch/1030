@@ -1,5 +1,5 @@
-import { cookies, headers } from "next/headers";
-import { createServerClient, type CookieOptions } from "@supabase/ssr";
+import { cookies } from "next/headers";
+import { createServerClient } from "@supabase/ssr";
 import type { Database } from "../types/database";
 import { getEnv } from "../env";
 
@@ -12,18 +12,14 @@ export function supabaseServer() {
     NEXT_PUBLIC_SUPABASE_ANON_KEY,
     {
       cookies: {
-        get(name: string) {
-          return cookieStore.get(name)?.value;
+        getAll() {
+          return cookieStore.getAll();
         },
-        set(name: string, value: string, options: CookieOptions) {
-          cookieStore.set({ name, value, ...options });
+        setAll(cookies) {
+          cookies.forEach(({ name, value, options }) => {
+            cookieStore.set({ name, value, ...(options ?? {}) });
+          });
         },
-        remove(name: string, options: CookieOptions) {
-          cookieStore.set({ name, value: "", ...options });
-        },
-      },
-      headers: {
-        Authorization: headers().get("Authorization") ?? undefined,
       },
     }
   );
