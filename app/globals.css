@@ -64,7 +64,13 @@ button { font: inherit; color: inherit; }
 .metric-streak-bar-full { background:linear-gradient(180deg, rgba(78,161,255,0.4), rgba(78,161,255,0.1)); }
 .dashboard { gap:32px; }
 .dashboard-stack { display:flex; flex-direction:column; gap:28px; }
-.dashboard-metrics { grid-template-columns:repeat(auto-fit, minmax(220px,1fr)); }
+.dashboard-metrics { grid-template-columns:repeat(6, minmax(0,1fr)); align-items:stretch; }
+.dashboard-metrics .metrics-card { padding:16px; gap:8px; }
+.dashboard-metrics .metrics-label { font-size:11px; }
+.dashboard-metrics .metrics-value { font-size:26px; }
+.dashboard-metrics .metrics-figure { gap:8px; }
+.dashboard-metrics .metric-chart { width:86px; height:38px; }
+.dashboard-metrics .metric-streak { gap:3px; }
 .dashboard-panels { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:22px; align-items:start; }
 
 .messages-panel .panel-header { align-items:center; }
@@ -91,6 +97,10 @@ button { font: inherit; color: inherit; }
 
 @media (max-width: 1200px) {
   .dashboard-panels { grid-template-columns:1fr; }
+}
+
+@media (max-width: 1320px) {
+  .dashboard-metrics { grid-template-columns:repeat(3, minmax(0,1fr)); }
 }
 
 @media (max-width: 720px) {
