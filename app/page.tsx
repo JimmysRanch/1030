@@ -60,19 +60,6 @@ const messages = [
 export default function Page() {
   return (
     <section className="page dashboard">
-      <header className="page-header">
-        <div>
-          <h1>Dashboard</h1>
-          <p className="page-subtitle">
-            A snapshot of grooming studio performance and client communication.
-          </p>
-        </div>
-        <div className="page-header-meta">
-          <span className="page-header-date">Wednesday, October 12</span>
-          <span className="page-header-timezone">Pacific Daylight Time</span>
-        </div>
-      </header>
-
       <div className="dashboard-stack">
         <div className="dashboard-metrics metrics-grid">
           {metrics.map(metric => {
@@ -185,22 +172,6 @@ export default function Page() {
             </div>
           </section>
         </div>
-
-        <section className="panel activity-panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Recent Activity</h2>
-              <p className="panel-subtitle">Latest actions by staff members</p>
-            </div>
-          </header>
-          <div className="empty-state">
-            <div className="empty-ring" aria-hidden="true">
-              <span className="empty-ring-inner" />
-            </div>
-            <p>No recent activity to display</p>
-            <span className="empty-subcopy">Activity will appear here as your team checks in.</span>
-          </div>
-        </section>
       </div>
     </section>
   );
