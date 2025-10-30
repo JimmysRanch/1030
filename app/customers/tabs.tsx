@@ -4,19 +4,29 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { href: "/customers", label: "Client Roster" },
-  { href: "/customers/pets", label: "Pets" },
+  { href: "/customers", label: "Overview" },
+  { href: "/customers/pets", label: "Clients & Pets" },
 ];
 
 export default function CustomersTabs() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? "";
 
   return (
     <nav className="tab-nav" aria-label="Client sections">
       {tabs.map(tab => {
-        const active =
-          pathname === tab.href ||
-          (tab.href !== "/customers" && pathname?.startsWith(tab.href));
+        let active = false;
+
+        if (tab.href === "/customers") {
+          active = pathname === tab.href;
+        } else if (tab.href === "/customers/pets") {
+          const clientProfilePath = /^\/customers\/[^/]+$/;
+          active =
+            pathname === tab.href ||
+            pathname.startsWith(`${tab.href}/`) ||
+            clientProfilePath.test(pathname);
+        } else {
+          active = pathname === tab.href || pathname.startsWith(`${tab.href}/`);
+        }
 
         return (
           <Link
