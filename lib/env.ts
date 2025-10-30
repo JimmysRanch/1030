@@ -1,25 +1,52 @@
-import { z } from "zod";
-
-const schema = z.object({
-  NEXT_PUBLIC_SUPABASE_URL: z.string().url(),
-  NEXT_PUBLIC_SUPABASE_ANON_KEY: z.string().min(1),
-});
-
-export type Env = z.infer<typeof schema>;
+export type Env = {
+  NEXT_PUBLIC_SUPABASE_URL: string;
+  NEXT_PUBLIC_SUPABASE_ANON_KEY: string;
+};
 
 let cached: Env | null = null;
 
-export function getEnv(): Env {
-  if (cached) return cached;
-  const parsed = schema.safeParse(process.env);
-  if (!parsed.success) {
-    const issues = parsed.error.issues
-      .map((issue) => `- ${issue.path.join(".")}: ${issue.message}`)
-      .join("\n");
-    throw new Error(
-      `Missing/invalid environment variables:\n${issues}\nPopulate .env using .env.example`
-    );
+function validateUrl(value: string | undefined) {
+  if (!value) {
+    return "NEXT_PUBLIC_SUPABASE_URL is required";
   }
-  cached = parsed.data;
+  try {
+    // eslint-disable-next-line no-new
+    new URL(value);
+  } catch {
+    return "NEXT_PUBLIC_SUPABASE_URL must be a valid URL";
+  }
+  return null;
+}
+
+function validateKey(value: string | undefined) {
+  if (!value) {
+    return "NEXT_PUBLIC_SUPABASE_ANON_KEY is required";
+  }
+  if (value.trim().length === 0) {
+    return "NEXT_PUBLIC_SUPABASE_ANON_KEY cannot be blank";
+  }
+  return null;
+}
+
+export function getEnv(): Env {
+  if (cached) {
+    return cached;
+  }
+
+  const { NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY } = process.env;
+
+  const issues = [validateUrl(NEXT_PUBLIC_SUPABASE_URL), validateKey(NEXT_PUBLIC_SUPABASE_ANON_KEY)]
+    .filter((message): message is string => Boolean(message));
+
+  if (issues.length > 0) {
+    const formatted = issues.map(item => `- ${item}`).join("\n");
+    throw new Error(`Missing/invalid environment variables:\n${formatted}\nPopulate .env using .env.example`);
+  }
+
+  cached = {
+    NEXT_PUBLIC_SUPABASE_URL: NEXT_PUBLIC_SUPABASE_URL!,
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+  };
+
   return cached;
 }
