@@ -14,67 +14,6 @@ type ClientWithPets = {
   displayPets: Client["pets"];
 };
 
-const totalClients = clientProfiles.length;
-const totalPets = clientProfiles.reduce((count, client) => count + client.pets.length, 0);
-const newPetsThisMonth = clientProfiles.reduce(
-  (count, client) => count + client.pets.filter(pet => pet.status === "New").length,
-  0,
-);
-
-const topBreed = (() => {
-  const breedFrequency = new Map<string, number>();
-
-  clientProfiles.forEach(client => {
-    client.pets.forEach(pet => {
-      if (pet.species === "Dog") {
-        breedFrequency.set(pet.breed, (breedFrequency.get(pet.breed) ?? 0) + 1);
-      }
-    });
-  });
-
-  let winningBreed: string | null = null;
-  let winningCount = 0;
-
-  breedFrequency.forEach((count, breed) => {
-    if (count > winningCount) {
-      winningBreed = breed;
-      winningCount = count;
-    }
-  });
-
-  return winningBreed ? { breed: winningBreed, count: winningCount } : null;
-})();
-
-const summaryMetrics = [
-  {
-    label: "Total Clients",
-    value: totalClients.toString(),
-    description: "Active members on your roster",
-    className: "metrics-total",
-  },
-  {
-    label: "Total Pets",
-    value: totalPets.toString(),
-    description: "Across every household",
-    className: "metrics-active",
-  },
-  {
-    label: "New Pets This Month",
-    value: newPetsThisMonth.toString(),
-    description: "Fresh faces in April",
-    className: "metrics-onboarding",
-  },
-  {
-    label: "Top Breed",
-    value: topBreed?.breed ?? "No data",
-    description:
-      topBreed && topBreed.count > 0
-        ? `${topBreed.count} recent appointments`
-        : "Track popular visits at a glance",
-    className: "metrics-leave",
-  },
-];
-
 function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [petSections, setPetSections] = useState<number[]>([0]);
   const [referralSource, setReferralSource] = useState<string>("");
@@ -330,16 +269,6 @@ export default function ClientsAndPetsPage() {
     <>
       <ClientFormDialog open={formOpen} onClose={() => setFormOpen(false)} />
       <div className="page-stack gap-large">
-        <section className="metrics-grid" aria-label="Client and pet summary metrics">
-          {summaryMetrics.map(metric => (
-            <article key={metric.label} className={`metrics-card ${metric.className ?? ""}`.trim()}>
-              <span className="metrics-label">{metric.label}</span>
-              <strong className="metrics-value">{metric.value}</strong>
-              <p className="metrics-description">{metric.description}</p>
-            </article>
-          ))}
-        </section>
-
         <section className="panel client-roster">
           <div className="roster-toolbar" role="search">
             <label className="compact-search client-search">
