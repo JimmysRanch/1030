@@ -105,6 +105,22 @@ button { font: inherit; color: inherit; }
 .message-snippet { margin:0; font-size:13px; color:#aabce0; }
 .message-empty { text-align:center; padding:24px 12px; color:#9fb2d9; background:rgba(14,18,26,0.7); border-radius:16px; border:1px dashed rgba(78,161,255,0.24); }
 
+.workload-list { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:16px; }
+.workload-item { display:flex; flex-direction:column; gap:14px; background:rgba(12,16,24,0.88); border-radius:20px; padding:18px; border:1px solid #1a2030; box-shadow:0 20px 44px rgba(5,9,18,0.38); }
+.workload-main { display:flex; align-items:center; gap:12px; }
+.workload-avatar { width:44px; height:44px; border-radius:14px; display:flex; align-items:center; justify-content:center; font-weight:700; letter-spacing:0.08em; background:linear-gradient(160deg, rgba(78,161,255,0.35), rgba(78,161,255,0.12)); color:#081426; box-shadow:0 12px 28px rgba(5,9,18,0.45); }
+.workload-copy { display:flex; flex-direction:column; gap:4px; }
+.workload-name { font-weight:600; letter-spacing:0.01em; }
+.workload-role { font-size:12px; color:var(--muted); text-transform:uppercase; letter-spacing:0.18em; }
+.workload-meta { display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:12px; font-size:12px; color:var(--muted); }
+.workload-shift { font-size:12px; color:#7c89a3; }
+.workload-progress { display:flex; flex-direction:column; gap:8px; }
+.workload-progress-track { position:relative; width:100%; height:8px; border-radius:999px; background:rgba(32,38,52,0.86); overflow:hidden; box-shadow:inset 0 1px 2px rgba(5,9,18,0.6); }
+.workload-progress-track span { position:absolute; inset:0; border-radius:999px; background:linear-gradient(90deg, rgba(78,161,255,0.85), rgba(90,220,255,0.6)); box-shadow:0 0 12px rgba(78,161,255,0.35); }
+.workload-count { font-size:12px; color:#9fb2d9; text-transform:uppercase; letter-spacing:0.16em; }
+.workload-specialties { display:flex; flex-wrap:wrap; gap:8px; }
+
+
 .empty-state { display:flex; flex-direction:column; align-items:center; gap:12px; padding:36px 16px; text-align:center; color:#9aa4b2; background:rgba(14,18,26,0.75); border-radius:20px; border:1px dashed rgba(78,161,255,0.24); }
 .empty-ring { width:72px; height:72px; border-radius:50%; border:2px dashed rgba(78,161,255,0.28); display:flex; align-items:center; justify-content:center; }
 .empty-ring-inner { display:block; width:24px; height:24px; border-radius:50%; background:linear-gradient(160deg, rgba(78,161,255,0.45), rgba(78,161,255,0.1)); box-shadow:0 0 18px rgba(78,161,255,0.35); }

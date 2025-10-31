@@ -11,44 +11,44 @@ type Metric = {
 const metrics: Metric[] = [
   {
     label: "Appointments Today",
-    value: "0",
-    description: "0 appointments on the books",
+    value: "18",
+    description: "12 completed · 6 upcoming",
     accentClass: "metrics-total",
-    chart: [6, 10, 8, 12, 9, 11, 7],
+    chart: [6, 9, 12, 18, 15, 20, 18],
   },
   {
     label: "This Week",
-    value: "0",
-    description: "Total scheduled appointments",
-    chart: [2, 6, 4, 9, 3, 5, 2],
+    value: "74",
+    description: "Up 12% vs. last week",
+    chart: [42, 48, 51, 63, 58, 69, 74],
   },
   {
     label: "Booked Today",
-    value: "0%",
+    value: "86%",
     description: "Of available slots filled",
     accentClass: "metrics-onboarding",
-    progress: 18,
+    progress: 86,
   },
   {
     label: "Active Clients",
-    value: "0",
-    description: "0 new this week",
-    streak: [1, 0, 1, 1, 0, 0, 1, 0, 1, 0, 0, 1],
+    value: "312",
+    description: "14 new this week",
+    streak: [1, 1, 1, 1, 0, 1, 1, 1, 0, 1, 1, 1],
     accentClass: "metrics-active",
   },
   {
     label: "Monthly Revenue",
-    value: "$0",
-    description: "$0 from new clients",
+    value: "$42.6k",
+    description: "$6.2k from new clients",
     accentClass: "metrics-total",
-    chart: [3, 5, 7, 5, 9, 4, 6],
+    chart: [24, 27, 31, 33, 37, 39, 42],
   },
   {
     label: "Avg. Ticket",
-    value: "$0",
+    value: "$73",
     description: "30 day trailing average",
     accentClass: "metrics-leave",
-    progress: 32,
+    progress: 72,
   },
 ];
 
@@ -86,9 +86,125 @@ const messages: Message[] = [
     body: "Wanted to say thanks – Bailey looks amazing after yesterday's visit.",
     time: "1d ago",
   },
+  {
+    id: "tina-hernandez",
+    name: "Tina Hernandez",
+    initials: "TH",
+    title: "Add blueberry facial for Momo",
+    body: "Could we add the blueberry facial to Momo's bath this afternoon?",
+    time: "1d ago",
+  },
+  {
+    id: "oliver-wells",
+    name: "Oliver Wells",
+    initials: "OW",
+    title: "Question about loyalty points",
+    body: "How many more points do we need before Max qualifies for a free groom?",
+    time: "3d ago",
+  },
 ];
 
-const recentActivity: ActivityItem[] = [];
+const recentActivity: ActivityItem[] = [
+  {
+    id: "activity-1",
+    actor: "Lauren Patel",
+    action: "checked in Peanut for Full Groom",
+    detail: "Assigned to Jamie",
+    time: "5m ago",
+  },
+  {
+    id: "activity-2",
+    actor: "Jamie Lee",
+    action: "completed Charlie's haircut",
+    detail: "Rated 5 stars",
+    time: "26m ago",
+  },
+  {
+    id: "activity-3",
+    actor: "Jess Reed",
+    action: "added PupScouts daycare add-on",
+    detail: "For Daisy",
+    time: "1h ago",
+  },
+  {
+    id: "activity-4",
+    actor: "Lauren Patel",
+    action: "scheduled follow-up for Luna",
+    detail: "Next visit on Apr 11",
+    time: "2h ago",
+  },
+  {
+    id: "activity-5",
+    actor: "Courtney Bell",
+    action: "refunded nail trim add-on",
+    detail: "Invoice #8831",
+    time: "Yesterday",
+  },
+];
+
+type Groomer = {
+  id: string;
+  name: string;
+  initials: string;
+  role: string;
+  status: "active" | "neutral" | "leave" | "onboarding";
+  statusLabel: string;
+  shift: string;
+  pets: number;
+  capacity: number;
+  specialties: string[];
+};
+
+const groomers: Groomer[] = [
+  {
+    id: "jamie-lee",
+    name: "Jamie Lee",
+    initials: "JL",
+    role: "Senior Groomer",
+    status: "active",
+    statusLabel: "On schedule",
+    shift: "Shift: 8:00a – 4:00p",
+    pets: 6,
+    capacity: 8,
+    specialties: ["Doodles", "Hand stripping"],
+  },
+  {
+    id: "taylor-ng",
+    name: "Taylor Ng",
+    initials: "TN",
+    role: "Groomer",
+    status: "active",
+    statusLabel: "Currently bathing Scout",
+    shift: "Shift: 9:30a – 5:30p",
+    pets: 5,
+    capacity: 7,
+    specialties: ["Small breeds", "Color touch-ups"],
+  },
+  {
+    id: "lauren-patel",
+    name: "Lauren Patel",
+    initials: "LP",
+    role: "Stylist",
+    status: "neutral",
+    statusLabel: "Prep for Peanut",
+    shift: "Shift: 10:00a – 6:00p",
+    pets: 4,
+    capacity: 6,
+    specialties: ["Poodles", "Show cuts"],
+  },
+  {
+    id: "bryce-miller",
+    name: "Bryce Miller",
+    initials: "BM",
+    role: "Bather",
+    status: "onboarding",
+    statusLabel: "Shadowing Jess",
+    shift: "Shift: 11:00a – 7:00p",
+    pets: 2,
+    capacity: 5,
+    specialties: ["Bath & brush", "Teeth cleaning"],
+  },
+];
 
 export default function Page() {
   return (
@@ -252,14 +368,61 @@ export default function Page() {
                   <h2 className="panel-title">Groomer Workload</h2>
                   <p className="panel-subtitle">Monitor who&rsquo;s on the floor today</p>
                 </div>
+                <button className="ghost-button" type="button">
+                  Manage Schedule
+                </button>
               </header>
-              <div className="empty-state">
-                <div className="empty-ring" aria-hidden="true">
-                  <span className="empty-ring-inner" />
+              {groomers.length === 0 ? (
+                <div className="empty-state">
+                  <div className="empty-ring" aria-hidden="true">
+                    <span className="empty-ring-inner" />
+                  </div>
+                  <p>No active groomers</p>
+                  <span className="empty-subcopy">Check back once shifts are assigned.</span>
                 </div>
-                <p>No active groomers</p>
-                <span className="empty-subcopy">Check back once shifts are assigned.</span>
-              </div>
+              ) : (
+                <ul className="workload-list">
+                  {groomers.map(groomer => {
+                    const load = Math.max(
+                      0,
+                      Math.min(Math.round((groomer.pets / groomer.capacity) * 100), 100),
+                    );
+
+                    return (
+                      <li key={groomer.id} className="workload-item">
+                        <div className="workload-main">
+                          <div className="workload-avatar" aria-hidden="true">
+                            {groomer.initials}
+                          </div>
+                          <div className="workload-copy">
+                            <span className="workload-name">{groomer.name}</span>
+                            <span className="workload-role">{groomer.role}</span>
+                          </div>
+                        </div>
+                        <div className="workload-meta">
+                          <span className={`status-pill status-${groomer.status}`}>
+                            {groomer.statusLabel}
+                          </span>
+                          <span className="workload-shift">{groomer.shift}</span>
+                        </div>
+                        <div className="workload-progress">
+                          <div className="workload-progress-track">
+                            <span style={{ width: `${load}%` }} />
+                          </div>
+                          <span className="workload-count">{groomer.pets} / {groomer.capacity} pets</span>
+                        </div>
+                        <div className="workload-specialties">
+                          {groomer.specialties.map(specialty => (
+                            <span key={specialty} className="chip">
+                              {specialty}
+                            </span>
+                          ))}
+                        </div>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
             </section>
           </div>
         </div>
