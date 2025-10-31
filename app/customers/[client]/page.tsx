@@ -48,35 +48,51 @@ export default function ClientProfilePage({
         ))}
       </section>
 
-      <section className="panel client-profile-hero">
-        <header className="profile-header">
-          <div className="profile-heading">
-            <h2>{client.name}</h2>
-            <p className="profile-meta">Favorite groomer {client.favoriteGroomer}</p>
-            <p className="row-secondary">{client.email}</p>
-            <p className="row-secondary">{client.phone}</p>
-            <p className="row-secondary">{client.address}</p>
-          </div>
-          <div className="profile-actions">
-            <button type="button" className="action-button">
-              Edit client info
-            </button>
-            <button type="button" className="action-button">
-              Update contact details
-            </button>
-          </div>
-        </header>
+      <div className="profile-grid-layout">
+        <section className="panel client-profile-overview">
+          <header className="owner-card-header">
+            <div className="profile-heading">
+              <h2>{client.name}</h2>
+              <p className="profile-meta">Favorite groomer {client.favoriteGroomer}</p>
+            </div>
+            <div className="profile-actions">
+              <button type="button" className="action-button">
+                Edit client info
+              </button>
+              <button type="button" className="action-button">
+                Update contact details
+              </button>
+            </div>
+          </header>
 
-        <div className="profile-quick-actions" role="toolbar" aria-label={`Quick actions for ${client.name}`}>
-          {client.quickActions.map(action => (
-            <button key={action} type="button" className="quick-action-button">
-              {action}
-            </button>
-          ))}
-        </div>
-      </section>
+          <dl className="owner-contact-grid">
+            <div className="owner-contact-item">
+              <dt>Email</dt>
+              <dd>{client.email}</dd>
+            </div>
+            <div className="owner-contact-item">
+              <dt>Phone</dt>
+              <dd>{client.phone}</dd>
+            </div>
+            <div className="owner-contact-item">
+              <dt>Address</dt>
+              <dd>{client.address}</dd>
+            </div>
+            <div className="owner-contact-item">
+              <dt>Member since</dt>
+              <dd>{client.membershipSince}</dd>
+            </div>
+          </dl>
 
-      <div className="profile-split-grid">
+          <div className="profile-quick-actions" role="toolbar" aria-label={`Quick actions for ${client.name}`}>
+            {client.quickActions.map(action => (
+              <button key={action} type="button" className="quick-action-button">
+                {action}
+              </button>
+            ))}
+          </div>
+        </section>
+
         <section className="panel message-thread" aria-label="Message history">
           <header className="section-header">
             <div>
@@ -103,51 +119,14 @@ export default function ClientProfilePage({
           </ul>
         </section>
 
-        <section className="panel staff-notes" aria-label="Private staff notes">
-          <header className="section-header">
-            <div>
-              <h3>Private Staff Notes</h3>
-              <p>Keep the team aligned with favorite pinned reminders and context for every visit.</p>
-            </div>
-            <button type="button" className="action-button">
-              Add note
-            </button>
-          </header>
-          <div className="staff-notes-grid">
-            {pinnedNotes.map(note => (
-              <article key={note.id} className="note-card note-pinned">
-                <span className="note-label">Pinned</span>
-                <h4>{note.category}</h4>
-                <p>{note.content}</p>
-                <footer>
-                  <span>{note.author}</span>
-                  <span className="row-secondary">{note.createdAt}</span>
-                </footer>
-              </article>
-            ))}
-            {otherNotes.map(note => (
-              <article key={note.id} className="note-card">
-                <h4>{note.category}</h4>
-                <p>{note.content}</p>
-                <footer>
-                  <span>{note.author}</span>
-                  <span className="row-secondary">{note.createdAt}</span>
-                </footer>
-              </article>
-            ))}
-          </div>
-        </section>
-      </div>
-
-      <div className="pet-card-grid">
         {client.pets.map(pet => {
           const shareTargets = Array.from(new Set(pet.gallery.flatMap(item => item.shareTargets)));
 
           return (
-          <section key={pet.id} id={pet.id} className="panel pet-profile-card" aria-labelledby={`${pet.id}-heading`}>
-            <header className="pet-profile-header">
-              <div className="pet-profile-heading">
-                <h3 id={`${pet.id}-heading`}>{pet.name}</h3>
+            <section key={pet.id} id={pet.id} className="panel pet-profile-card" aria-labelledby={`${pet.id}-heading`}>
+              <header className="pet-profile-header">
+                <div className="pet-profile-heading">
+                  <h3 id={`${pet.id}-heading`}>{pet.name}</h3>
                 <p className="pet-profile-meta">
                   {pet.breed} • {pet.color} • {pet.plan}
                 </p>
@@ -324,6 +303,41 @@ export default function ClientProfilePage({
           </section>
           );
         })}
+
+        <section className="panel staff-notes profile-grid-span" aria-label="Private staff notes">
+          <header className="section-header">
+            <div>
+              <h3>Private Staff Notes</h3>
+              <p>Keep the team aligned with favorite pinned reminders and context for every visit.</p>
+            </div>
+            <button type="button" className="action-button">
+              Add note
+            </button>
+          </header>
+          <div className="staff-notes-grid">
+            {pinnedNotes.map(note => (
+              <article key={note.id} className="note-card note-pinned">
+                <span className="note-label">Pinned</span>
+                <h4>{note.category}</h4>
+                <p>{note.content}</p>
+                <footer>
+                  <span>{note.author}</span>
+                  <span className="row-secondary">{note.createdAt}</span>
+                </footer>
+              </article>
+            ))}
+            {otherNotes.map(note => (
+              <article key={note.id} className="note-card">
+                <h4>{note.category}</h4>
+                <p>{note.content}</p>
+                <footer>
+                  <span>{note.author}</span>
+                  <span className="row-secondary">{note.createdAt}</span>
+                </footer>
+              </article>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );
