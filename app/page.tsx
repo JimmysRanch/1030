@@ -180,84 +180,88 @@ export default function Page() {
         </div>
 
         <div className="dashboard-panels-grid">
-          <section className="panel messages-panel">
-            <header className="panel-header">
-              <div>
-                <h2 className="panel-title">Messages</h2>
-                <p className="panel-subtitle">Latest check-ins from pet parents</p>
-              </div>
-              <button className="ghost-button" type="button">
-                View Inbox
-              </button>
-            </header>
-            <ul className="message-list">
-              {messages.map(message => (
-                <li key={message.id} className="message-item">
-                  <div className="message-avatar" aria-hidden="true">
-                    {message.initials}
-                  </div>
-                  <div className="message-copy">
-                    <div className="message-header">
-                      <span className="message-name">{message.name}</span>
-                      <span className="message-time">{message.time}</span>
+          <div className="dashboard-column">
+            <section className="panel messages-panel">
+              <header className="panel-header">
+                <div>
+                  <h2 className="panel-title">Messages</h2>
+                  <p className="panel-subtitle">Latest check-ins from pet parents</p>
+                </div>
+                <button className="ghost-button" type="button">
+                  View Inbox
+                </button>
+              </header>
+              <ul className="message-list">
+                {messages.map(message => (
+                  <li key={message.id} className="message-item">
+                    <div className="message-avatar" aria-hidden="true">
+                      {message.initials}
                     </div>
-                    <div className="message-title">{message.title}</div>
-                    <p className="message-snippet">{message.body}</p>
+                    <div className="message-copy">
+                      <div className="message-header">
+                        <span className="message-name">{message.name}</span>
+                        <span className="message-time">{message.time}</span>
+                      </div>
+                      <div className="message-title">{message.title}</div>
+                      <p className="message-snippet">{message.body}</p>
+                    </div>
+                  </li>
+                ))}
+                {messages.length === 0 ? (
+                  <li className="message-empty">You&rsquo;re all caught up! 🎉</li>
+                ) : null}
+              </ul>
+            </section>
+
+            <section className="panel activity-panel">
+              <header className="panel-header">
+                <div>
+                  <h2 className="panel-title">Recent Activity</h2>
+                  <p className="panel-subtitle">Latest activity by staff members</p>
+                </div>
+              </header>
+              {recentActivity.length === 0 ? (
+                <div className="empty-state activity-empty">
+                  <div className="empty-ring" aria-hidden="true">
+                    <span className="empty-ring-inner" />
                   </div>
-                </li>
-              ))}
-              {messages.length === 0 ? (
-                <li className="message-empty">You&rsquo;re all caught up! 🎉</li>
-              ) : null}
-            </ul>
-          </section>
+                  <p>No recent activity</p>
+                  <span className="empty-subcopy">There&rsquo;s no recent activity to display.</span>
+                </div>
+              ) : (
+                <ul className="activity-list">
+                  {recentActivity.map(item => (
+                    <li key={item.id} className="activity-item">
+                      <div className="activity-copy">
+                        <span className="activity-actor">{item.actor}</span>
+                        <span className="activity-action">{item.action}</span>
+                        {item.detail ? <span className="activity-detail">{item.detail}</span> : null}
+                      </div>
+                      <span className="activity-time">{item.time}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          </div>
 
-          <section className="panel workload-panel">
-            <header className="panel-header">
-              <div>
-                <h2 className="panel-title">Groomer Workload</h2>
-                <p className="panel-subtitle">Monitor who&rsquo;s on the floor today</p>
-              </div>
-            </header>
-            <div className="empty-state">
-              <div className="empty-ring" aria-hidden="true">
-                <span className="empty-ring-inner" />
-              </div>
-              <p>No active groomers</p>
-              <span className="empty-subcopy">Check back once shifts are assigned.</span>
-            </div>
-          </section>
-
-          <section className="panel activity-panel">
-            <header className="panel-header">
-              <div>
-                <h2 className="panel-title">Recent Activity</h2>
-                <p className="panel-subtitle">Latest activity by staff members</p>
-              </div>
-            </header>
-            {recentActivity.length === 0 ? (
-              <div className="empty-state activity-empty">
+          <div className="dashboard-column">
+            <section className="panel workload-panel">
+              <header className="panel-header">
+                <div>
+                  <h2 className="panel-title">Groomer Workload</h2>
+                  <p className="panel-subtitle">Monitor who&rsquo;s on the floor today</p>
+                </div>
+              </header>
+              <div className="empty-state">
                 <div className="empty-ring" aria-hidden="true">
                   <span className="empty-ring-inner" />
                 </div>
-                <p>No recent activity</p>
-                <span className="empty-subcopy">There&rsquo;s no recent activity to display.</span>
+                <p>No active groomers</p>
+                <span className="empty-subcopy">Check back once shifts are assigned.</span>
               </div>
-            ) : (
-              <ul className="activity-list">
-                {recentActivity.map(item => (
-                  <li key={item.id} className="activity-item">
-                    <div className="activity-copy">
-                      <span className="activity-actor">{item.actor}</span>
-                      <span className="activity-action">{item.action}</span>
-                      {item.detail ? <span className="activity-detail">{item.detail}</span> : null}
-                    </div>
-                    <span className="activity-time">{item.time}</span>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
+            </section>
+          </div>
         </div>
       </div>
     </section>
