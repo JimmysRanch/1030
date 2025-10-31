@@ -86,23 +86,6 @@ export function formatStatus(value: string | null | undefined) {
     .join(" ");
 }
 
-export function invoiceStatusTone(value: string | null | undefined) {
-  if (!value) {
-    return "status-neutral";
-  }
-  const normalized = value.toLowerCase();
-  if (normalized.includes("paid") || normalized.includes("settled")) {
-    return "status-active";
-  }
-  if (normalized.includes("overdue") || normalized.includes("past due")) {
-    return "status-leave";
-  }
-  if (normalized.includes("pending") || normalized.includes("partial")) {
-    return "status-onboarding";
-  }
-  return "status-neutral";
-}
-
 export function expenseStatusTone(value: string | null | undefined) {
   if (!value) {
     return "status-neutral";
@@ -205,19 +188,15 @@ export function vendorStatusTone(value: string | null | undefined) {
   return "status-neutral";
 }
 
-export function purchaseOrderStatusTone(value: string | null | undefined) {
-  if (!value) {
-    return "status-neutral";
-  }
-  const normalized = value.toLowerCase();
-  if (normalized.includes("received") || normalized.includes("approved")) {
-    return "status-active";
-  }
-  if (normalized.includes("awaiting") || normalized.includes("in transit") || normalized.includes("draft")) {
-    return "status-onboarding";
-  }
-  if (normalized.includes("canceled") || normalized.includes("void")) {
-    return "status-leave";
-  }
-  return "status-neutral";
-}
+
+
+
+
+
+
+
+
+
+
+
+

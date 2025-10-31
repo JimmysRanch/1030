@@ -1,23 +1,3 @@
-
-export type FinanceInvoice = {
-  id: string;
-  invoiceNumber: string | null;
-  clientName: string | null;
-  petName: string | null;
-  status: string | null;
-  issuedOn: string | null;
-  dueOn: string | null;
-  paidOn: string | null;
-  services: string[];
-  subtotal: number | null;
-  tax: number | null;
-  total: number | null;
-  balanceDue: number | null;
-  paymentMethod: string | null;
-  notes: string | null;
-  tags: string[];
-};
-
 export type FinanceExpense = {
   id: string;
   category: string | null;
@@ -100,35 +80,9 @@ export type FinanceVendor = {
   spendYtd: number;
   openBalance: number;
   paymentTerms: string;
-  lastInvoiceOn: string | null;
+  lastExpenseOn: string | null;
   contacts: FinanceVendorContact[];
   notes: string | null;
-};
-
-export type FinancePurchaseOrder = {
-  id: string;
-  vendor: string;
-  status: string | null;
-  issuedOn: string | null;
-  expectedOn: string | null;
-  items: string[];
-  subtotal: number;
-  tax: number;
-  shipping: number;
-  total: number;
-  balanceDue: number;
-  memo: string | null;
-};
-
-export type FinanceInvoiceSummary = {
-  total: number;
-  collected: number;
-  outstanding: number;
-  overdue: number;
-  invoiceCount: number;
-  paidCount: number;
-  openCount: number;
-  averageInvoice: number;
 };
 
 export type FinanceExpenseSummary = {
@@ -175,13 +129,6 @@ export type FinanceVendorSummary = {
   openBalance: number;
 };
 
-export type FinancePurchaseOrderSummary = {
-  openOrders: number;
-  awaitingReceipt: number;
-  receivedOrders: number;
-  totalCommitted: number;
-};
-
 export type ExpenseCategorySummary = {
   category: string;
   total: number;
@@ -194,225 +141,6 @@ export type CashflowPoint = {
   expenses: number;
   net: number;
 };
-
-const FINANCE_INVOICES: FinanceInvoice[] = [
-  {
-    id: "inv-sb-1051",
-    invoiceNumber: "SB-1051",
-    clientName: "Gina Walters",
-    petName: "Murphy",
-    status: "Paid",
-    issuedOn: "2025-04-02",
-    dueOn: "2025-04-09",
-    paidOn: "2025-04-06",
-    services: ["Full groom", "Blueberry facial"],
-    subtotal: 165,
-    tax: 12.54,
-    total: 177.54,
-    balanceDue: 0,
-    paymentMethod: "Card on file",
-    notes: "Prefers early morning drop-off",
-    tags: ["grooming", "vip"],
-  },
-  {
-    id: "inv-sb-1052",
-    invoiceNumber: "SB-1052",
-    clientName: "Marcos Vega",
-    petName: "Frida",
-    status: "Partial",
-    issuedOn: "2025-04-05",
-    dueOn: "2025-04-20",
-    paidOn: null,
-    services: ["Daycare", "Teeth brushing"],
-    subtotal: 120,
-    tax: 9.6,
-    total: 129.6,
-    balanceDue: 64.8,
-    paymentMethod: "Card on file",
-    notes: "Will settle remaining after payday",
-    tags: ["daycare"],
-  },
-  {
-    id: "inv-sb-1053",
-    invoiceNumber: "SB-1053",
-    clientName: "Naomi Ellis",
-    petName: "Scout",
-    status: "Open",
-    issuedOn: "2025-04-12",
-    dueOn: "2025-05-01",
-    paidOn: null,
-    services: ["Spring grooming package"],
-    subtotal: 210,
-    tax: 16.8,
-    total: 226.8,
-    balanceDue: 226.8,
-    paymentMethod: "ACH",
-    notes: "Requested gentle mat removal",
-    tags: ["grooming"],
-  },
-  {
-    id: "inv-sb-1046",
-    invoiceNumber: "SB-1046",
-    clientName: "Rowan Price",
-    petName: "Juniper",
-    status: "Overdue",
-    issuedOn: "2025-03-10",
-    dueOn: "2025-03-24",
-    paidOn: null,
-    services: ["Boarding", "Medication admin"],
-    subtotal: 340,
-    tax: 27.2,
-    total: 367.2,
-    balanceDue: 367.2,
-    paymentMethod: "Invoice",
-    notes: "Follow up weekly",
-    tags: ["boarding", "medical"],
-  },
-  {
-    id: "inv-sb-1045",
-    invoiceNumber: "SB-1045",
-    clientName: "Devon Chen",
-    petName: "Pixel",
-    status: "Paid",
-    issuedOn: "2025-03-04",
-    dueOn: "2025-03-11",
-    paidOn: "2025-03-09",
-    services: ["Haircut", "Paw balm"],
-    subtotal: 118,
-    tax: 9.44,
-    total: 127.44,
-    balanceDue: 0,
-    paymentMethod: "Apple Pay",
-    notes: "Add-on each visit",
-    tags: ["grooming"],
-  },
-  {
-    id: "inv-sb-1044",
-    invoiceNumber: "SB-1044",
-    clientName: "Lena Harper",
-    petName: "Cosmo",
-    status: "Paid",
-    issuedOn: "2025-02-22",
-    dueOn: "2025-03-01",
-    paidOn: "2025-02-28",
-    services: ["Boarding", "Grooming exit bath"],
-    subtotal: 420,
-    tax: 33.6,
-    total: 453.6,
-    balanceDue: 0,
-    paymentMethod: "Card on file",
-    notes: "Boarding deposit collected",
-    tags: ["boarding"],
-  },
-  {
-    id: "inv-sb-1043",
-    invoiceNumber: "SB-1043",
-    clientName: "Jessie Patel",
-    petName: "Loki",
-    status: "Partial",
-    issuedOn: "2025-03-15",
-    dueOn: "2025-04-25",
-    paidOn: "2025-03-18",
-    services: ["Daycare bundle"],
-    subtotal: 260,
-    tax: 20.8,
-    total: 280.8,
-    balanceDue: 140.4,
-    paymentMethod: "Card on file",
-    notes: "Remaining balance scheduled for auto-pay",
-    tags: ["daycare"],
-  },
-  {
-    id: "inv-sb-1042",
-    invoiceNumber: "SB-1042",
-    clientName: "Amber Holt",
-    petName: "Poppy",
-    status: "Paid",
-    issuedOn: "2025-02-14",
-    dueOn: "2025-02-21",
-    paidOn: "2025-02-19",
-    services: ["Spa day", "Teeth brushing"],
-    subtotal: 150,
-    tax: 12,
-    total: 162,
-    balanceDue: 0,
-    paymentMethod: "Cash",
-    notes: null,
-    tags: ["spa"],
-  },
-  {
-    id: "inv-sb-1054",
-    invoiceNumber: "SB-1054",
-    clientName: "Brett Lane",
-    petName: "Miso",
-    status: "Scheduled",
-    issuedOn: "2025-04-16",
-    dueOn: "2025-05-08",
-    paidOn: null,
-    services: ["Mobile grooming"],
-    subtotal: 185,
-    tax: 14.8,
-    total: 199.8,
-    balanceDue: 199.8,
-    paymentMethod: "Card on file",
-    notes: "Mobile van appointment",
-    tags: ["mobile"],
-  },
-  {
-    id: "inv-sb-1041",
-    invoiceNumber: "SB-1041",
-    clientName: "Carmen Ortiz",
-    petName: "Koda",
-    status: "Paid",
-    issuedOn: "2025-02-01",
-    dueOn: "2025-02-08",
-    paidOn: "2025-02-07",
-    services: ["Training session", "Follow-up call"],
-    subtotal: 195,
-    tax: 15.6,
-    total: 210.6,
-    balanceDue: 0,
-    paymentMethod: "Card on file",
-    notes: "Great progress",
-    tags: ["training"],
-  },
-  {
-    id: "inv-sb-1039",
-    invoiceNumber: "SB-1039",
-    clientName: "Noah Simmons",
-    petName: "Indy",
-    status: "Overdue",
-    issuedOn: "2025-02-18",
-    dueOn: "2025-03-05",
-    paidOn: null,
-    services: ["Boarding", "Grooming exit bath"],
-    subtotal: 360,
-    tax: 28.8,
-    total: 388.8,
-    balanceDue: 388.8,
-    paymentMethod: "Invoice",
-    notes: "Deposit missed",
-    tags: ["boarding"],
-  },
-  {
-    id: "inv-sb-1038",
-    invoiceNumber: "SB-1038",
-    clientName: "Ivy Barrett",
-    petName: "Nova",
-    status: "Paid",
-    issuedOn: "2025-01-20",
-    dueOn: "2025-01-27",
-    paidOn: "2025-01-26",
-    services: ["Grooming makeover"],
-    subtotal: 240,
-    tax: 19.2,
-    total: 259.2,
-    balanceDue: 0,
-    paymentMethod: "Card on file",
-    notes: "Add creative trim photos to gallery",
-    tags: ["grooming", "creative"],
-  },
-];
 
 const FINANCE_EXPENSES: FinanceExpense[] = [
   {
@@ -812,7 +540,7 @@ const FINANCE_VENDORS: FinanceVendor[] = [
     spendYtd: 6840.5,
     openBalance: 540,
     paymentTerms: "Net 15",
-    lastInvoiceOn: "2025-04-10",
+    lastExpenseOn: "2025-04-10",
     contacts: [
       { name: "Val Harper", email: "val@pawsitivesupply.com", phone: "555-210-3377" },
     ],
@@ -826,7 +554,7 @@ const FINANCE_VENDORS: FinanceVendor[] = [
     spendYtd: 1890.2,
     openBalance: 0,
     paymentTerms: "Net 7",
-    lastInvoiceOn: "2025-03-20",
+    lastExpenseOn: "2025-03-20",
     contacts: [
       { name: "Maya Lopez", email: "maya@sparklelinens.com", phone: "555-882-4401" },
     ],
@@ -840,7 +568,7 @@ const FINANCE_VENDORS: FinanceVendor[] = [
     spendYtd: 2250,
     openBalance: 750,
     paymentTerms: "Net 30",
-    lastInvoiceOn: "2025-04-14",
+    lastExpenseOn: "2025-04-14",
     contacts: [
       { name: "Devin Patel", email: "devin@tailwindfinance.com", phone: "555-664-1182" },
     ],
@@ -854,7 +582,7 @@ const FINANCE_VENDORS: FinanceVendor[] = [
     spendYtd: 1895.44,
     openBalance: 0,
     paymentTerms: "Autopay",
-    lastInvoiceOn: "2025-04-04",
+    lastExpenseOn: "2025-04-04",
     contacts: [
       { name: "Support", email: "care@cityenergy.com", phone: null },
     ],
@@ -868,7 +596,7 @@ const FINANCE_VENDORS: FinanceVendor[] = [
     spendYtd: 1450,
     openBalance: 450,
     paymentTerms: "Net 15",
-    lastInvoiceOn: "2025-04-13",
+    lastExpenseOn: "2025-04-13",
     contacts: [
       { name: "Cameron Lee", email: "cameron@fetchsocial.io", phone: "555-441-2255" },
     ],
@@ -882,7 +610,7 @@ const FINANCE_VENDORS: FinanceVendor[] = [
     spendYtd: 1971,
     openBalance: 0,
     paymentTerms: "Quarterly",
-    lastInvoiceOn: "2025-03-12",
+    lastExpenseOn: "2025-03-12",
     contacts: [
       { name: "Dana Reilly", email: "dana@groomguard.com", phone: "555-300-7844" },
     ],
@@ -890,74 +618,13 @@ const FINANCE_VENDORS: FinanceVendor[] = [
   },
 ];
 
-const FINANCE_PURCHASE_ORDERS: FinancePurchaseOrder[] = [
-  {
-    id: "po-8807",
-    vendor: "Pawsitive Supply Co.",
-    status: "Awaiting Receipt",
-    issuedOn: "2025-04-09",
-    expectedOn: "2025-04-16",
-    items: ["Hypoallergenic shampoo", "Bandana assortment", "Grooming shears"],
-    subtotal: 1240.5,
-    tax: 111.65,
-    shipping: 48,
-    total: 1400.15,
-    balanceDue: 1400.15,
-    memo: "Spring spa refresh",
-  },
-  {
-    id: "po-8806",
-    vendor: "Sparkle Linens",
-    status: "Received",
-    issuedOn: "2025-03-22",
-    expectedOn: "2025-03-28",
-    items: ["Deluxe towel bundle", "Eco dryer sheets"],
-    subtotal: 640,
-    tax: 57.6,
-    shipping: 0,
-    total: 697.6,
-    balanceDue: 0,
-    memo: "Restock deluxe towels",
-  },
-  {
-    id: "po-8805",
-    vendor: "Tailwind Accounting",
-    status: "Approved",
-    issuedOn: "2025-04-12",
-    expectedOn: "2025-04-30",
-    items: ["Quarterly close", "Annual prep"],
-    subtotal: 2250,
-    tax: 0,
-    shipping: 0,
-    total: 2250,
-    balanceDue: 2250,
-    memo: "Q2 finance retainer",
-  },
-  {
-    id: "po-8804",
-    vendor: "GroomGuard Insurance",
-    status: "Draft",
-    issuedOn: "2025-04-05",
-    expectedOn: "2025-04-19",
-    items: ["Fleet rider update"],
-    subtotal: 890,
-    tax: 0,
-    shipping: 0,
-    total: 890,
-    balanceDue: 890,
-    memo: "Awaiting underwriting confirmation",
-  },
-];
-
 const DATA_REFERENCE_DATE: Date = (() => {
   const candidates: Array<Date | null> = [
-    ...FINANCE_INVOICES.map(invoice => parseDate(invoice.dueOn)),
     ...FINANCE_EXPENSES.map(expense => parseDate(expense.dueOn ?? expense.incurredOn)),
     ...FINANCE_PAYOUTS.map(payout => parseDate(payout.payoutDate)),
     ...FINANCE_PAYMENTS.map(payment => parseDate(payment.settledOn ?? payment.initiatedOn)),
     ...FINANCE_PAYROLL_RUNS.map(run => parseDate(run.payDate ?? run.processedOn)),
     ...FINANCE_TAX_FILINGS.map(filing => parseDate(filing.dueOn ?? filing.submittedOn)),
-    ...FINANCE_PURCHASE_ORDERS.map(order => parseDate(order.expectedOn ?? order.issuedOn)),
   ];
 
   const timestamps = candidates
@@ -973,10 +640,6 @@ const DATA_REFERENCE_DATE: Date = (() => {
   // Normalize to start of day for consistent comparisons.
   return startOfDay(reference);
 })();
-
-export async function getFinanceInvoices(): Promise<FinanceInvoice[]> {
-  return FINANCE_INVOICES.map(cloneInvoice);
-}
 
 export async function getFinanceExpenses(): Promise<FinanceExpense[]> {
   return FINANCE_EXPENSES.map(expense => ({ ...expense }));
@@ -1003,57 +666,6 @@ export async function getFinanceVendors(): Promise<FinanceVendor[]> {
     ...vendor,
     contacts: vendor.contacts.map(contact => ({ ...contact })),
   }));
-}
-
-export async function getFinancePurchaseOrders(): Promise<FinancePurchaseOrder[]> {
-  return FINANCE_PURCHASE_ORDERS.map(order => ({ ...order, items: [...order.items] }));
-}
-
-export function summarizeInvoices(invoices: FinanceInvoice[]): FinanceInvoiceSummary {
-  if (invoices.length === 0) {
-    return {
-      total: 0,
-      collected: 0,
-      outstanding: 0,
-      overdue: 0,
-      invoiceCount: 0,
-      paidCount: 0,
-      openCount: 0,
-      averageInvoice: 0,
-    };
-  }
-
-  const total = sumNumbers(invoices.map(invoice => invoice.total));
-  const collected = sumNumbers(invoices.map(collectedShare));
-  const outstanding = sumNumbers(invoices.map(remainingInvoiceBalance));
-
-  const overdue = invoices.filter(invoice => {
-    const balance = remainingInvoiceBalance(invoice);
-    if (!balance) {
-      return false;
-    }
-    const dueDate = parseDate(invoice.dueOn);
-    if (!dueDate) {
-      return false;
-    }
-    return dueDate.getTime() < DATA_REFERENCE_DATE.getTime();
-  }).length;
-
-  const invoiceCount = invoices.length;
-  const paidCount = invoices.filter(invoice => isPaid(invoice.status)).length;
-  const openCount = invoices.filter(invoice => isOpen(invoice.status)).length;
-  const averageInvoice = invoiceCount ? total / invoiceCount : 0;
-
-  return {
-    total,
-    collected,
-    outstanding,
-    overdue,
-    invoiceCount,
-    paidCount,
-    openCount,
-    averageInvoice,
-  };
 }
 
 export function summarizeExpenses(expenses: FinanceExpense[]): FinanceExpenseSummary {
@@ -1247,31 +859,6 @@ export function summarizeVendors(vendors: FinanceVendor[]): FinanceVendorSummary
   };
 }
 
-export function summarizePurchaseOrders(
-  orders: FinancePurchaseOrder[],
-): FinancePurchaseOrderSummary {
-  if (orders.length === 0) {
-    return {
-      openOrders: 0,
-      awaitingReceipt: 0,
-      receivedOrders: 0,
-      totalCommitted: 0,
-    };
-  }
-
-  const awaitingReceipt = orders.filter(order => orderStatusMatches(order.status, ["awaiting", "in transit"])).length;
-  const receivedOrders = orders.filter(order => orderStatusMatches(order.status, ["received", "closed"])).length;
-  const openOrders = orders.filter(order => !orderStatusMatches(order.status, ["received", "closed"])).length;
-  const totalCommitted = sumNumbers(orders.map(order => order.total));
-
-  return {
-    openOrders,
-    awaitingReceipt,
-    receivedOrders,
-    totalCommitted,
-  };
-}
-
 export function selectUpcomingPayrollRun(
   runs: FinancePayrollRun[],
 ): FinancePayrollRun | null {
@@ -1302,14 +889,6 @@ export function selectDueSoonFilings(
     .map(filing => ({ ...filing }));
 }
 
-export function selectOpenPurchaseOrders(
-  orders: FinancePurchaseOrder[],
-): FinancePurchaseOrder[] {
-  return orders
-    .filter(order => !orderStatusMatches(order.status, ["received", "closed"]))
-    .map(order => ({ ...order, items: [...order.items] }));
-}
-
 export function groupExpensesByCategory(
   expenses: FinanceExpense[],
 ): ExpenseCategorySummary[] {
@@ -1332,61 +911,26 @@ export function groupExpensesByCategory(
     .sort((a, b) => b.total - a.total);
 }
 
-export function selectUpcomingReceivables(
-  invoices: FinanceInvoice[],
-): FinanceInvoice[] {
-  return invoices
-    .filter(invoice => {
-      const balance = remainingInvoiceBalance(invoice);
-      if (!balance) {
+export function selectOverdueExpenses(
+  expenses: FinanceExpense[],
+): FinanceExpense[] {
+  return expenses
+    .filter(expense => {
+      if (isExpenseSettled(expense.status)) {
         return false;
       }
-      const dueDate = parseDate(invoice.dueOn);
-      if (!dueDate) {
-        return false;
-      }
-      return dueDate.getTime() >= DATA_REFERENCE_DATE.getTime();
-    })
-    .sort((a, b) => compareDates(a.dueOn, b.dueOn));
-}
-
-export function selectOverdueInvoices(
-  invoices: FinanceInvoice[],
-): FinanceInvoice[] {
-  return invoices
-    .filter(invoice => {
-      const balance = remainingInvoiceBalance(invoice);
-      if (!balance) {
-        return false;
-      }
-      const dueDate = parseDate(invoice.dueOn);
+      const dueDate = parseDate(expense.dueOn ?? expense.incurredOn);
       if (!dueDate) {
         return false;
       }
       return dueDate.getTime() < DATA_REFERENCE_DATE.getTime();
     })
-    .sort((a, b) => compareDates(a.dueOn, b.dueOn));
-}
-
-export function remainingInvoiceBalance(invoice: FinanceInvoice): number | null {
-  if (invoice.balanceDue !== null && invoice.balanceDue !== undefined) {
-    return Math.max(0, invoice.balanceDue);
-  }
-
-  if (invoice.total === null || invoice.total === undefined) {
-    return null;
-  }
-
-  if (isPaid(invoice.status)) {
-    return 0;
-  }
-
-  const collected = collectedShare(invoice);
-  return Math.max(0, invoice.total - collected);
+    .sort((a, b) => compareDates(a.dueOn ?? a.incurredOn, b.dueOn ?? b.incurredOn))
+    .map(expense => ({ ...expense }));
 }
 
 export function buildCashflowTimeline(
-  invoices: FinanceInvoice[],
+  payments: FinancePayment[],
   expenses: FinanceExpense[],
   months: number,
 ): CashflowPoint[] {
@@ -1397,17 +941,20 @@ export function buildCashflowTimeline(
   const points: CashflowPoint[] = [];
 
   for (let index = months - 1; index >= 0; index -= 1) {
-    const date = new Date(Date.UTC(
-      DATA_REFERENCE_DATE.getUTCFullYear(),
-      DATA_REFERENCE_DATE.getUTCMonth() - index,
-      1,
-    ));
+    const date = new Date(
+      Date.UTC(DATA_REFERENCE_DATE.getUTCFullYear(), DATA_REFERENCE_DATE.getUTCMonth() - index, 1),
+    );
     const key = monthKeyFromDate(date);
 
     const revenue = sumNumbers(
-      invoices
-        .filter(invoice => monthKey(invoice.issuedOn) === key)
-        .map(invoice => invoice.total),
+      payments
+        .filter(payment => {
+          if (!isPaymentSettled(payment.status)) {
+            return false;
+          }
+          return monthKey(payment.settledOn ?? payment.initiatedOn) === key;
+        })
+        .map(payment => paymentNet(payment)),
     );
 
     const expenseTotal = sumNumbers(
@@ -1509,21 +1056,7 @@ function isPayoutUpcoming(payout: FinancePayout): boolean {
   );
 }
 
-function collectedShare(invoice: FinanceInvoice): number {
-  if (invoice.total === null || invoice.total === undefined) {
-    return 0;
-  }
 
-  if (invoice.balanceDue !== null && invoice.balanceDue !== undefined) {
-    return Math.max(0, invoice.total - invoice.balanceDue);
-  }
-
-  if (isPaid(invoice.status)) {
-    return invoice.total;
-  }
-
-  return 0;
-}
 
 function netFrom(payout: FinancePayout): number {
   const gross = payout.gross ?? 0;
@@ -1541,13 +1074,7 @@ function sumNumbers(values: Array<number | null | undefined>): number {
   return total;
 }
 
-function cloneInvoice(invoice: FinanceInvoice): FinanceInvoice {
-  return {
-    ...invoice,
-    services: [...invoice.services],
-    tags: [...invoice.tags],
-  };
-}
+
 
 function paymentNet(payment: FinancePayment): number {
   const amount = payment.amount ?? 0;
@@ -1631,10 +1158,4 @@ function isVendorOnHold(status: string | null | undefined): boolean {
   return normalized.includes("pending") || normalized.includes("hold") || normalized.includes("suspended");
 }
 
-function orderStatusMatches(status: string | null | undefined, tokens: string[]): boolean {
-  if (!status) {
-    return false;
-  }
-  const normalized = status.toLowerCase();
-  return tokens.some(token => normalized.includes(token));
-}
+

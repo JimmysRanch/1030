@@ -1,21 +1,16 @@
 import {
   buildCashflowTimeline,
   getFinanceExpenses,
-  getFinanceInvoices,
   getFinancePayments,
   getFinancePayrollRuns,
   getFinancePayouts,
-  getFinancePurchaseOrders,
   getFinanceTaxFilings,
   getFinanceVendors,
-  remainingInvoiceBalance,
-  selectOverdueInvoices,
+  selectOverdueExpenses,
   summarizeExpenses,
-  summarizeInvoices,
   summarizePayments,
   summarizePayroll,
   summarizePayouts,
-  summarizePurchaseOrders,
   summarizeTaxFilings,
   summarizeVendors,
   type CashflowPoint,
@@ -127,40 +122,27 @@ function createChartGeometry(points: CashflowPoint[]): ChartGeometry {
 }
 
 export default async function Page() {
-  const [
-    invoices,
-    expenses,
-    payouts,
-    payments,
-    payrollRuns,
-    taxFilings,
-    vendors,
-    purchaseOrders,
-  ] = await Promise.all([
-    getFinanceInvoices(),
+  const [expenses, payouts, payments, payrollRuns, taxFilings, vendors] = await Promise.all([
     getFinanceExpenses(),
     getFinancePayouts(),
     getFinancePayments(),
     getFinancePayrollRuns(),
     getFinanceTaxFilings(),
     getFinanceVendors(),
-    getFinancePurchaseOrders(),
   ]);
 
-  const invoiceSummary = summarizeInvoices(invoices);
   const expenseSummary = summarizeExpenses(expenses);
   const payoutSummary = summarizePayouts(payouts);
   const paymentSummary = summarizePayments(payments);
   const payrollSummary = summarizePayroll(payrollRuns);
   const taxSummary = summarizeTaxFilings(taxFilings);
   const vendorSummary = summarizeVendors(vendors);
-  const purchaseOrderSummary = summarizePurchaseOrders(purchaseOrders);
-  const overdueInvoices = selectOverdueInvoices(invoices);
-  const overdueBalance = overdueInvoices.reduce((total, invoice) => {
-    return total + (remainingInvoiceBalance(invoice) ?? 0);
+  const overdueExpenses = selectOverdueExpenses(expenses);
+  const overdueBalance = overdueExpenses.reduce((total, expense) => {
+    return total + (expense.amount ?? 0);
   }, 0);
 
-  const cashflow = buildCashflowTimeline(invoices, expenses, 6);
+  const cashflow = buildCashflowTimeline(payments, expenses, 6);
   const currentPeriod = cashflow[cashflow.length - 1] ?? { revenue: 0, expenses: 0, net: 0 };
   const previousPeriod = cashflow[cashflow.length - 2] ?? null;
 
@@ -199,11 +181,16 @@ export default async function Page() {
 
   const quickActions: QuickActionCard[] = [
     {
-      title: "Invoices",
-      hint: `${formatNumber(invoiceSummary.overdue)} overdue`,
-      value: formatCurrency(invoiceSummary.outstanding),
-      href: "/finances/invoices",
-      action: "View/Create",
+      title: "Bills",
+      hint: `${formatNumber(overdueExpenses.length)} overdue`,
+      value: formatCurrency(overdueBalance),
+      valueTone: overdueExpenses.length > 0 ? "warning" : "muted",
+      caption:
+        expenseSummary.upcomingCount > 0
+          ? `${formatNumber(expenseSummary.upcomingCount)} upcoming`
+          : undefined,
+      href: "/finances/expenses",
+      action: "Review Bills",
     },
     {
       title: "Payments",
@@ -212,13 +199,6 @@ export default async function Page() {
       caption: nextPayoutAmount ?? undefined,
       href: "/finances/payments",
       action: "View Ledger",
-    },
-    {
-      title: "Expenses",
-      hint: `${formatNumber(expenseSummary.upcomingCount)} upcoming`,
-      value: formatCurrency(expenseSummary.monthToDate),
-      href: "/finances/expenses",
-      action: "Manage",
     },
     {
       title: "Taxes",
@@ -246,13 +226,6 @@ export default async function Page() {
       action: "Manage",
     },
     {
-      title: "Purchase Orders",
-      hint: `${formatNumber(purchaseOrderSummary.openOrders)} outstanding`,
-      value: formatCurrency(purchaseOrderSummary.totalCommitted),
-      href: "/finances/purchase-orders",
-      action: "Track",
-    },
-    {
       title: "Fees",
       hint: "MTD processor fees",
       value: formatCurrency(payoutSummary.fees),
@@ -261,14 +234,16 @@ export default async function Page() {
     },
   ];
 
-  const banner = overdueInvoices.length
+  const banner = overdueExpenses.length
     ? {
         variant: "warning" as const,
         icon: "⚠️",
-        title: `Follow up on ${formatNumber(overdueInvoices.length)} overdue invoice${
-          overdueInvoices.length === 1 ? "" : "s"
+        title: `Follow up on ${formatNumber(overdueExpenses.length)} overdue bill${
+          overdueExpenses.length === 1 ? "" : "s"
         }`,
-        message: `There is ${formatCurrencyPrecise(overdueBalance)} outstanding that needs attention. Send reminders to wrap things up.`,
+        message: `There is ${formatCurrencyPrecise(
+          overdueBalance,
+        )} awaiting payment. Schedule payments or mark bills as paid to clear this alert.`,
       }
     : {
         variant: "success" as const,

@@ -22,7 +22,7 @@ export default async function Page() {
       label: "Active vendors",
       value: formatNumber(summary.activeVendors),
       accent: "metrics-active",
-      description: "Vendors ready to receive purchase orders",
+      description: "Vendors ready to receive requests and bills",
     },
     {
       label: "On hold",
@@ -40,7 +40,7 @@ export default async function Page() {
       label: "Open balance",
       value: formatCurrency(summary.openBalance),
       accent: "metrics-outstanding",
-      description: "Invoices still unpaid",
+      description: "Outstanding bills owed",
     },
   ];
 
@@ -106,7 +106,7 @@ export default async function Page() {
                 <th scope="col">Category</th>
                 <th scope="col">Contacts</th>
                 <th scope="col">Terms</th>
-                <th scope="col">Last invoice</th>
+                <th scope="col">Last bill</th>
                 <th scope="col">Spend YTD</th>
                 <th scope="col">Open balance</th>
                 <th scope="col">Status</th>
@@ -135,7 +135,7 @@ export default async function Page() {
                       </ul>
                     </td>
                     <td>{vendor.paymentTerms}</td>
-                    <td>{formatDate(vendor.lastInvoiceOn)}</td>
+                    <td>{formatDate(vendor.lastExpenseOn)}</td>
                     <td>{formatCurrencyPrecise(vendor.spendYtd)}</td>
                     <td>{formatCurrencyPrecise(vendor.openBalance)}</td>
                     <td>

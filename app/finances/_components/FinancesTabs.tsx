@@ -11,13 +11,11 @@ type TabConfig = {
 
 const tabs: TabConfig[] = [
   { href: "/finances", label: "Dashboard", icon: "dashboard" },
-  { href: "/finances/invoices", label: "Invoices", icon: "invoice" },
   { href: "/finances/expenses", label: "Expenses", icon: "expense" },
   { href: "/finances/payments", label: "Payments", icon: "payments" },
   { href: "/finances/payroll", label: "Payroll", icon: "payroll" },
   { href: "/finances/taxes", label: "Taxes", icon: "tax" },
   { href: "/finances/vendors", label: "Vendors", icon: "vendor" },
-  { href: "/finances/purchase-orders", label: "Purchase Orders", icon: "purchaseOrder" },
 ];
 
 const ICONS = {
@@ -25,14 +23,6 @@ const ICONS = {
     <svg viewBox="0 0 20 20" aria-hidden="true" className="tab-icon-svg">
       <path
         d="M3 4.5C3 3.67 3.67 3 4.5 3h3A1.5 1.5 0 0 1 9 4.5v3A1.5 1.5 0 0 1 7.5 9h-3A1.5 1.5 0 0 1 3 7.5v-3Zm7 0A1.5 1.5 0 0 1 11.5 3h4A1.5 1.5 0 0 1 17 4.5v2A1.5 1.5 0 0 1 15.5 8h-4A1.5 1.5 0 0 1 10 6.5v-2Zm0 7A1.5 1.5 0 0 1 11.5 10h3A1.5 1.5 0 0 1 16 11.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 10 14.5v-3Zm-7 0A1.5 1.5 0 0 1 4.5 10H7a1.5 1.5 0 0 1 1.5 1.5v4A1.5 1.5 0 0 1 7 17H4.5A1.5 1.5 0 0 1 3 15.5v-4Z"
-        fill="currentColor"
-      />
-    </svg>
-  ),
-  invoice: (
-    <svg viewBox="0 0 20 20" aria-hidden="true" className="tab-icon-svg">
-      <path
-        d="M6.5 3A1.5 1.5 0 0 0 5 4.5v11A1.5 1.5 0 0 0 6.5 17h7a1.5 1.5 0 0 0 1.5-1.5v-11A1.5 1.5 0 0 0 13.5 3h-7Zm.5 3.75a.75.75 0 0 1 .75-.75h4a.75.75 0 0 1 0 1.5h-4A.75.75 0 0 1 7 6.75Zm0 3a.75.75 0 0 1 .75-.75h4a.75.75 0 0 1 0 1.5h-4a.75.75 0 0 1-.75-.75Zm0 3a.75.75 0 0 1 .75-.75h2a.75.75 0 0 1 0 1.5h-2A.75.75 0 0 1 7 12.75Z"
         fill="currentColor"
       />
     </svg>
@@ -77,14 +67,6 @@ const ICONS = {
       />
     </svg>
   ),
-  purchaseOrder: (
-    <svg viewBox="0 0 20 20" aria-hidden="true" className="tab-icon-svg">
-      <path
-        d="M6 3a1 1 0 0 0-1 1v12l4-2l4 2V4a1 1 0 0 0-1-1H6Zm2.5 3.5a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Zm0 3a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5Z"
-        fill="currentColor"
-      />
-    </svg>
-  ),
 } as const;
 
 function isActive(pathname: string, href: string) {
@@ -98,7 +80,7 @@ export default function FinancesTabs() {
   const pathname = usePathname() ?? "/finances";
 
   return (
-    <div className="tab-nav">
+    <div className="tab-nav finances-tab-nav">
       {tabs.map(tab => (
         <Link
           key={tab.href}
