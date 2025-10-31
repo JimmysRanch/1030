@@ -8,12 +8,8 @@ import {
   getFinancePurchaseOrders,
   getFinanceTaxFilings,
   getFinanceVendors,
-  groupExpensesByCategory,
   remainingInvoiceBalance,
-  selectDueSoonFilings,
-  selectOpenPurchaseOrders,
   selectOverdueInvoices,
-  selectUpcomingReceivables,
   summarizeExpenses,
   summarizeInvoices,
   summarizePayments,
@@ -22,6 +18,7 @@ import {
   summarizePurchaseOrders,
   summarizeTaxFilings,
   summarizeVendors,
+  type CashflowPoint,
 } from "./data";
 import {
   formatCurrency,
@@ -29,54 +26,104 @@ import {
   formatDate,
   formatMonthKey,
   formatNumber,
-  formatStatus,
-  invoiceStatusTone,
-  paymentStatusTone,
-  payoutStatusTone,
-  taxStatusTone,
-  vendorStatusTone,
-  purchaseOrderStatusTone,
 } from "./format";
 
-const quickActions = [
-  {
-    title: "Create invoice",
-    description: "Bill pet parents for grooming, boarding, or daycare services.",
-    href: "/finances/invoices",
-  },
-  {
-    title: "Record expense",
-    description: "Log rent, utilities, and vendor spend for month-to-date tracking.",
-    href: "/finances/expenses",
-  },
-  {
-    title: "Log customer payment",
-    description: "Capture cash, card, or ACH payments collected on-site.",
-    href: "/finances/payments",
-  },
-  {
-    title: "Schedule payroll",
-    description: "Review hours and send the next payroll run for your team.",
-    href: "/finances/payroll",
-  },
-];
+type PercentChange = {
+  label: string;
+  trend: "up" | "down" | "flat";
+};
 
-function compareByDateDesc(
-  left: string | null | undefined,
-  right: string | null | undefined,
-) {
-  const leftDate = left ? new Date(left).getTime() : 0;
-  const rightDate = right ? new Date(right).getTime() : 0;
-  return rightDate - leftDate;
+type ChartGeometry = {
+  viewBox: string;
+  width: number;
+  height: number;
+  revenuePath: string;
+  expensesPath: string;
+  netPath: string;
+  zeroLine: number;
+};
+
+type QuickActionCard = {
+  title: string;
+  hint: string;
+  value: string;
+  href: string;
+  action: string;
+  valueTone?: "brand" | "warning" | "muted";
+  caption?: string;
+};
+
+function calculatePercentChange(current: number, previous: number): PercentChange {
+  const safeCurrent = Number.isFinite(current) ? current : 0;
+  const safePrevious = Number.isFinite(previous) ? previous : 0;
+
+  if (safePrevious === 0) {
+    if (safeCurrent === 0) {
+      return { label: "0.0% vs previous month", trend: "flat" };
+    }
+    const trend = safeCurrent > 0 ? "up" : "down";
+    const magnitude = 100;
+    const prefix = trend === "down" ? "-" : "+";
+    return { label: `${prefix}${magnitude.toFixed(1)}% vs previous month`, trend };
+  }
+
+  const change = ((safeCurrent - safePrevious) / Math.abs(safePrevious)) * 100;
+  const trend = change === 0 ? "flat" : change > 0 ? "up" : "down";
+  const formatted = `${change >= 0 ? "+" : ""}${change.toFixed(1)}% vs previous month`;
+  return { label: formatted, trend };
 }
 
-function sumBalance(values: Array<number | null | undefined>) {
-  return values.reduce<number>((total, value) => {
-    if (typeof value === "number" && Number.isFinite(value)) {
-      return total + value;
-    }
-    return total;
-  }, 0);
+function createChartGeometry(points: CashflowPoint[]): ChartGeometry {
+  const width = 720;
+  const height = 260;
+  const padding = { top: 28, right: 36, bottom: 40, left: 48 };
+  const innerWidth = width - padding.left - padding.right;
+  const innerHeight = height - padding.top - padding.bottom;
+
+  if (!points.length) {
+    const zero = padding.top + innerHeight;
+    return {
+      viewBox: `0 0 ${width} ${height}`,
+      width,
+      height,
+      revenuePath: "",
+      expensesPath: "",
+      netPath: "",
+      zeroLine: zero,
+    };
+  }
+
+  const values = points.flatMap(point => [point.revenue ?? 0, point.expenses ?? 0, point.net ?? 0]);
+  const maxValue = Math.max(...values, 0);
+  const minValue = Math.min(...values, 0);
+  const range = maxValue - minValue || 1;
+
+  const step = points.length > 1 ? innerWidth / (points.length - 1) : 0;
+
+  const mapX = (index: number) => padding.left + step * index;
+  const mapY = (value: number | null | undefined) => {
+    const resolved = Number.isFinite(value) ? (value as number) : 0;
+    const normalized = (resolved - minValue) / range;
+    return padding.top + innerHeight - normalized * innerHeight;
+  };
+
+  const buildPath = (key: "revenue" | "expenses" | "net") =>
+    points
+      .map((point, index) => {
+        const command = index === 0 ? "M" : "L";
+        return `${command}${mapX(index)} ${mapY(point[key])}`;
+      })
+      .join(" ");
+
+  return {
+    viewBox: `0 0 ${width} ${height}`,
+    width,
+    height,
+    revenuePath: buildPath("revenue"),
+    expensesPath: buildPath("expenses"),
+    netPath: buildPath("net"),
+    zeroLine: mapY(0),
+  };
 }
 
 export default async function Page() {
@@ -108,479 +155,233 @@ export default async function Page() {
   const taxSummary = summarizeTaxFilings(taxFilings);
   const vendorSummary = summarizeVendors(vendors);
   const purchaseOrderSummary = summarizePurchaseOrders(purchaseOrders);
-
-  const upcomingReceivables = selectUpcomingReceivables(invoices).slice(0, 5);
   const overdueInvoices = selectOverdueInvoices(invoices);
-  const overdueTotal = sumBalance(overdueInvoices.map(remainingInvoiceBalance));
-  const expenseBreakdown = groupExpensesByCategory(expenses).slice(0, 6);
-  const cashflow = buildCashflowTimeline(invoices, expenses, 6);
-  const recentPayouts = payouts.slice(0, 4);
-  const recentPayments = payments
-    .slice()
-    .sort((a, b) => compareByDateDesc(a.settledOn ?? a.initiatedOn, b.settledOn ?? b.initiatedOn))
-    .slice(0, 5);
-  const dueSoonFilings = selectDueSoonFilings(taxFilings, 21);
-  const openPurchaseOrders = selectOpenPurchaseOrders(purchaseOrders).slice(0, 4);
-  const topVendors = vendors
-    .slice()
-    .sort((a, b) => b.spendYtd - a.spendYtd)
-    .slice(0, 5);
+  const overdueBalance = overdueInvoices.reduce((total, invoice) => {
+    return total + (remainingInvoiceBalance(invoice) ?? 0);
+  }, 0);
 
-  const metrics = [
+  const cashflow = buildCashflowTimeline(invoices, expenses, 6);
+  const currentPeriod = cashflow[cashflow.length - 1] ?? { revenue: 0, expenses: 0, net: 0 };
+  const previousPeriod = cashflow[cashflow.length - 2] ?? null;
+
+  const moneyInChange = calculatePercentChange(currentPeriod.revenue ?? 0, previousPeriod?.revenue ?? 0);
+  const moneyOutChange = calculatePercentChange(currentPeriod.expenses ?? 0, previousPeriod?.expenses ?? 0);
+  const moneyLeftChange = calculatePercentChange(currentPeriod.net ?? 0, previousPeriod?.net ?? 0);
+
+  const kpis = [
     {
-      label: "Collected to date",
-      value: formatCurrency(invoiceSummary.collected),
-      accent: "metrics-total",
-      description: `${formatNumber(invoiceSummary.paidCount)} paid invoices`,
+      title: "Money In (This Month)",
+      value: formatCurrencyPrecise(currentPeriod.revenue ?? 0),
+      change: moneyInChange,
+      tone: "positive" as const,
     },
     {
-      label: "Outstanding",
-      value: formatCurrency(invoiceSummary.outstanding),
-      accent: "metrics-outstanding",
-      description: `${formatNumber(invoiceSummary.overdue)} overdue`,
+      title: "Money Out (This Month)",
+      value: formatCurrencyPrecise(currentPeriod.expenses ?? 0),
+      change: moneyOutChange,
+      tone: "negative" as const,
     },
     {
-      label: "Settled payments",
-      value: formatCurrency(paymentSummary.settledVolume),
-      accent: "metrics-active",
-      description: `${formatNumber(recentPayments.length)} recent`,
-    },
-    {
-      label: "Operating spend",
-      value: formatCurrency(expenseSummary.monthToDate),
-      accent: "metrics-expense",
-      description: `${formatNumber(expenseSummary.count)} expenses tracked`,
-    },
-    {
-      label: "Upcoming payroll",
-      value: formatCurrency(payrollSummary.upcomingRun?.net ?? 0),
-      accent: "metrics-onboarding",
-      description: payrollSummary.upcomingRun
-        ? `${formatNumber(payrollSummary.upcomingRun.teamMembers)} teammates get paid ${formatDate(
-            payrollSummary.upcomingRun.payDate,
-          )}`
-        : "No runs scheduled",
-    },
-    {
-      label: "Tax due",
-      value: formatCurrency(taxSummary.totalDue),
-      accent: "metrics-leave",
-      description: `${formatNumber(taxSummary.dueSoonCount)} filings in the next 3 weeks`,
+      title: "What's Left (This Month)",
+      value: formatCurrencyPrecise(currentPeriod.net ?? 0),
+      change: moneyLeftChange,
+      tone: (currentPeriod.net ?? 0) >= 0 ? ("positive" as const) : ("negative" as const),
     },
   ];
 
+  const nextPayoutDate = payoutSummary.nextPayout?.payoutDate
+    ? `Next payout · ${formatDate(payoutSummary.nextPayout.payoutDate)}`
+    : "Next payout";
+  const nextPayoutAmount = payoutSummary.nextPayout
+    ? `${formatCurrencyPrecise(payoutSummary.nextPayout.net ?? payoutSummary.nextPayout.gross ?? 0)} expected`
+    : null;
+  const nextPayroll = payrollSummary.upcomingRun;
+
+  const quickActions: QuickActionCard[] = [
+    {
+      title: "Invoices",
+      hint: `${formatNumber(invoiceSummary.overdue)} overdue`,
+      value: formatCurrency(invoiceSummary.outstanding),
+      href: "/finances/invoices",
+      action: "View/Create",
+    },
+    {
+      title: "Payments",
+      hint: nextPayoutDate,
+      value: formatCurrency(paymentSummary.settledVolume),
+      caption: nextPayoutAmount ?? undefined,
+      href: "/finances/payments",
+      action: "View Ledger",
+    },
+    {
+      title: "Expenses",
+      hint: `${formatNumber(expenseSummary.upcomingCount)} upcoming`,
+      value: formatCurrency(expenseSummary.monthToDate),
+      href: "/finances/expenses",
+      action: "Manage",
+    },
+    {
+      title: "Taxes",
+      hint: "QTD collected",
+      value: formatCurrency(taxSummary.totalDue),
+      href: "/finances/taxes",
+      action: "Open Taxes",
+    },
+    {
+      title: "Payroll",
+      hint: "Next run",
+      value: nextPayroll ? formatDate(nextPayroll.payDate ?? nextPayroll.processedOn) : "Not scheduled",
+      valueTone: nextPayroll ? undefined : "brand",
+      caption: nextPayroll
+        ? `${formatNumber(nextPayroll.teamMembers)} team members • ${formatCurrency(nextPayroll.net ?? 0)}`
+        : undefined,
+      href: "/finances/payroll",
+      action: "Open Payroll",
+    },
+    {
+      title: "Vendors",
+      hint: `${formatNumber(vendorSummary.activeVendors)} active`,
+      value: formatCurrency(vendorSummary.openBalance),
+      href: "/finances/vendors",
+      action: "Manage",
+    },
+    {
+      title: "Purchase Orders",
+      hint: `${formatNumber(purchaseOrderSummary.openOrders)} outstanding`,
+      value: formatCurrency(purchaseOrderSummary.totalCommitted),
+      href: "/finances/purchase-orders",
+      action: "Track",
+    },
+    {
+      title: "Fees",
+      hint: "MTD processor fees",
+      value: formatCurrency(payoutSummary.fees),
+      href: "/finances/payments",
+      action: "Review",
+    },
+  ];
+
+  const banner = overdueInvoices.length
+    ? {
+        variant: "warning" as const,
+        icon: "⚠️",
+        title: `Follow up on ${formatNumber(overdueInvoices.length)} overdue invoice${
+          overdueInvoices.length === 1 ? "" : "s"
+        }`,
+        message: `There is ${formatCurrencyPrecise(overdueBalance)} outstanding that needs attention. Send reminders to wrap things up.`,
+      }
+    : {
+        variant: "success" as const,
+        icon: "✅",
+        title: "No active alerts",
+        message: "All financial tasks are up to date.",
+      };
+
+  const chart = createChartGeometry(cashflow);
+
   return (
-    <div className="stack gap-large">
-      <section className="metrics-grid">
-        {metrics.map(metric => (
-          <article key={metric.label} className={`metrics-card ${metric.accent}`}>
-            <header className="metrics-label">{metric.label}</header>
-            <div className="metrics-value">{metric.value}</div>
-            <p className="metrics-description">{metric.description}</p>
+    <div className="finance-page stack gap-large">
+      <section className="finance-kpi-grid">
+        {kpis.map(metric => (
+          <article key={metric.title} className={`finance-kpi-card tone-${metric.tone}`}>
+            <header className="finance-kpi-header">
+              <h2>{metric.title}</h2>
+              <span aria-hidden="true" className={`trend-icon ${metric.change.trend}`}>
+                {metric.change.trend === "down" ? "▼" : metric.change.trend === "up" ? "▲" : "■"}
+              </span>
+            </header>
+            <div className="finance-kpi-value">{metric.value}</div>
+            <p className={`finance-kpi-change trend-${metric.change.trend}`}>{metric.change.label}</p>
           </article>
         ))}
       </section>
 
-      <section className="panel finance-alert">
-        <div className="finance-alert-icon" aria-hidden="true">
-          <span>⚠️</span>
+      <section className={`finance-banner finance-banner-${banner.variant}`}>
+        <div className="finance-banner-icon" aria-hidden="true">
+          {banner.icon}
         </div>
-        <div className="finance-alert-body">
-          <h2>
-            {overdueInvoices.length > 0
-              ? `Follow up on ${formatNumber(overdueInvoices.length)} overdue invoice${
-                  overdueInvoices.length === 1 ? "" : "s"
-                }`
-              : "All invoices are current"}
-          </h2>
-          <p>
-            {overdueInvoices.length > 0
-              ? `There is ${formatCurrencyPrecise(overdueTotal)} in past-due balance dating back to March. Send reminders or apply credits to close them out.`
-              : "Great work! Your accounts receivable ledger is fully reconciled."}
-          </p>
-          <div className="finance-alert-actions">
-            <a className="button button-primary" href="/finances/invoices">
-              Review invoices
-            </a>
-            <a className="button button-ghost" href="/finances/payments">
-              Export aging report
-            </a>
-          </div>
+        <div className="finance-banner-body">
+          <h2>{banner.title}</h2>
+          <p>{banner.message}</p>
         </div>
       </section>
 
-      <div className="finance-overview-grid">
-        <section className="panel finance-cashflow-panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Cashflow snapshot</h2>
-              <p className="panel-subtitle">
-                Monthly revenue versus expenses across the last six periods.
-              </p>
-            </div>
-            <div className="finance-cashflow-meta">
-              <span>
-                Net change {formatCurrencyPrecise(cashflow.reduce((total, point) => total + point.net, 0))}
-              </span>
-            </div>
-          </header>
+      <section className="finance-overview-panel">
+        <header className="finance-overview-header">
+          <div>
+            <h2>Monthly Overview</h2>
+            <p>Revenue, expenses, and profit trends for the last six months.</p>
+          </div>
+          <div className="finance-overview-legend">
+            <span className="legend-item revenue">
+              <span aria-hidden="true" /> Revenue
+            </span>
+            <span className="legend-item expenses">
+              <span aria-hidden="true" /> Expenses
+            </span>
+            <span className="legend-item net">
+              <span aria-hidden="true" /> Profit
+            </span>
+          </div>
+        </header>
+        <div className="finance-chart">
           {cashflow.length === 0 ? (
-            <div className="panel-empty">Connect Supabase to see your cashflow history.</div>
+            <div className="finance-chart-empty">Connect Supabase to see your financial performance.</div>
           ) : (
-            <ul className="finance-cashflow" aria-label="Cashflow timeline">
-              {cashflow.map(point => {
-                const revenue = point.revenue ?? 0;
-                const expensesTotal = point.expenses ?? 0;
-                const net = point.net ?? 0;
-                const revenueBar = Math.min(100, Math.round((revenue / Math.max(revenue, expensesTotal, 1)) * 100));
-                const expenseBar = Math.min(100, Math.round((expensesTotal / Math.max(revenue, expensesTotal, 1)) * 100));
-
-                return (
-                  <li key={point.month} className="finance-cashflow-row">
-                    <span className="finance-cashflow-month">{formatMonthKey(point.month)}</span>
-                    <div className="finance-cashflow-bars" aria-hidden="true">
-                      <span className="finance-cashflow-bar revenue" style={{ width: `${revenueBar}%` }} />
-                      <span className="finance-cashflow-bar expense" style={{ width: `${expenseBar}%` }} />
-                    </div>
-                    <span className="finance-cashflow-revenue">{formatCurrencyPrecise(revenue)}</span>
-                    <span className="finance-cashflow-expense">{formatCurrencyPrecise(expensesTotal)}</span>
-                    <span className={`finance-cashflow-net ${net >= 0 ? "positive" : "negative"}`}>
-                      {formatCurrencyPrecise(net)}
-                    </span>
-                  </li>
-                );
-              })}
-            </ul>
+            <svg
+              className="finance-chart-svg"
+              viewBox={chart.viewBox}
+              role="img"
+              aria-label="Monthly revenue, expense, and profit chart"
+            >
+              <defs>
+                <linearGradient id="revenueGradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(90, 220, 255, 0.4)" />
+                  <stop offset="100%" stopColor="rgba(90, 220, 255, 0.05)" />
+                </linearGradient>
+                <linearGradient id="expenseGradient" x1="0" x2="0" y1="0" y2="1">
+                  <stop offset="0%" stopColor="rgba(255, 153, 102, 0.4)" />
+                  <stop offset="100%" stopColor="rgba(255, 153, 102, 0.05)" />
+                </linearGradient>
+              </defs>
+              <line
+                className="finance-chart-baseline"
+                x1={48}
+                x2={chart.width - 36}
+                y1={chart.zeroLine}
+                y2={chart.zeroLine}
+              />
+              <path className="finance-chart-line revenue" d={chart.revenuePath} />
+              <path className="finance-chart-line expenses" d={chart.expensesPath} />
+              <path className="finance-chart-line net" d={chart.netPath} />
+            </svg>
           )}
-        </section>
-
-        <section className="panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Quick actions</h2>
-              <p className="panel-subtitle">Jump into common finance workflows.</p>
-            </div>
-          </header>
-          <div className="quick-actions-grid">
-            {quickActions.map(action => (
-              <a key={action.title} className="quick-action-card" href={action.href}>
-                <h3>{action.title}</h3>
-                <p>{action.description}</p>
-              </a>
+        </div>
+        {cashflow.length > 0 ? (
+          <div className="finance-chart-months">
+            {cashflow.map(point => (
+              <span key={point.month}>{formatMonthKey(point.month)}</span>
             ))}
           </div>
-        </section>
-      </div>
-
-      <div className="finance-columns">
-        <section className="panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Upcoming receivables</h2>
-              <p className="panel-subtitle">Open invoices ordered by due date.</p>
-            </div>
-          </header>
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">Invoice</th>
-                  <th scope="col">Client</th>
-                  <th scope="col">Due</th>
-                  <th scope="col">Balance</th>
-                  <th scope="col">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {upcomingReceivables.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="table-empty">
-                      No outstanding receivables.
-                    </td>
-                  </tr>
-                ) : (
-                  upcomingReceivables.map(invoice => (
-                    <tr key={invoice.id}>
-                      <td>{invoice.invoiceNumber ?? "Invoice"}</td>
-                      <td>{invoice.clientName ?? "Unknown client"}</td>
-                      <td>{formatDate(invoice.dueOn)}</td>
-                      <td>{formatCurrencyPrecise(remainingInvoiceBalance(invoice))}</td>
-                      <td>
-                        <span className={`status-pill ${invoiceStatusTone(invoice.status)}`}>
-                          {formatStatus(invoice.status)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Tax deadlines</h2>
-              <p className="panel-subtitle">Filings approaching in the next 21 days.</p>
-            </div>
-          </header>
-          {dueSoonFilings.length === 0 ? (
-            <div className="panel-empty">No upcoming tax filings.</div>
-          ) : (
-            <ul className="finance-deadlines" aria-label="Upcoming tax filings">
-              {dueSoonFilings.map(filing => (
-                <li key={filing.id} className="finance-deadline-row">
-                  <div>
-                    <span className="finance-deadline-title">{filing.title}</span>
-                    <p className="finance-deadline-meta">
-                      {filing.jurisdiction} • {filing.form} • {filing.period}
-                    </p>
-                  </div>
-                  <div className="finance-deadline-right">
-                    <span className="finance-deadline-date">{formatDate(filing.dueOn)}</span>
-                    <span className={`status-pill ${taxStatusTone(filing.status)}`}>
-                      {formatStatus(filing.status)}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-
-        <section className="panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Open purchase orders</h2>
-              <p className="panel-subtitle">Orders awaiting fulfillment or approval.</p>
-            </div>
-            <div className="finance-purchase-summary">
-              <span>{formatNumber(purchaseOrderSummary.openOrders)} open</span>
-              <span>{formatCurrency(purchaseOrderSummary.totalCommitted)} committed</span>
-            </div>
-          </header>
-          {openPurchaseOrders.length === 0 ? (
-            <div className="panel-empty">No open purchase orders.</div>
-          ) : (
-            <ul className="finance-purchase-orders" aria-label="Open purchase orders">
-              {openPurchaseOrders.map(order => (
-                <li key={order.id} className="finance-purchase-row">
-                  <div className="finance-purchase-main">
-                    <span className="finance-purchase-id">{order.id}</span>
-                    <span className="finance-purchase-vendor">{order.vendor}</span>
-                    <p className="finance-purchase-items">{order.items.join(", ")}</p>
-                  </div>
-                  <div className="finance-purchase-meta">
-                    <span className="finance-purchase-amount">{formatCurrencyPrecise(order.total)}</span>
-                    <span className="finance-purchase-expected">Expected {formatDate(order.expectedOn)}</span>
-                    <span className={`status-pill ${purchaseOrderStatusTone(order.status)}`}>
-                      {formatStatus(order.status)}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </section>
-      </div>
-
-      <div className="finance-columns">
-        <section className="panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Recent payments</h2>
-              <p className="panel-subtitle">Customer payments captured across channels.</p>
-            </div>
-          </header>
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">Reference</th>
-                  <th scope="col">Customer</th>
-                  <th scope="col">Channel</th>
-                  <th scope="col">Processed</th>
-                  <th scope="col">Amount</th>
-                  <th scope="col">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentPayments.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="table-empty">
-                      Collect payments to see activity here.
-                    </td>
-                  </tr>
-                ) : (
-                  recentPayments.map(payment => (
-                    <tr key={payment.id}>
-                      <td>{payment.reference ?? "—"}</td>
-                      <td>{payment.customer ?? "—"}</td>
-                      <td>{payment.channel ?? "—"}</td>
-                      <td>{formatDate(payment.settledOn ?? payment.initiatedOn)}</td>
-                      <td>{formatCurrencyPrecise(payment.amount)}</td>
-                      <td>
-                        <span className={`status-pill ${paymentStatusTone(payment.status)}`}>
-                          {formatStatus(payment.status)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-
-        <section className="panel">
-          <header className="panel-header">
-            <div>
-              <h2 className="panel-title">Processor payouts</h2>
-              <p className="panel-subtitle">Upcoming settlements from payment providers.</p>
-            </div>
-          </header>
-          <div className="table-wrap">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th scope="col">Payout</th>
-                  <th scope="col">Provider</th>
-                  <th scope="col">Date</th>
-                  <th scope="col">Net</th>
-                  <th scope="col">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {recentPayouts.length === 0 ? (
-                  <tr>
-                    <td colSpan={5} className="table-empty">Connect Supabase to track payouts.</td>
-                  </tr>
-                ) : (
-                  recentPayouts.map(payout => (
-                    <tr key={payout.id}>
-                      <td>{payout.reference ?? "Payout"}</td>
-                      <td>{payout.provider ?? "—"}</td>
-                      <td>{formatDate(payout.payoutDate)}</td>
-                      <td>{formatCurrencyPrecise(payout.net ?? payout.gross)}</td>
-                      <td>
-                        <span className={`status-pill ${payoutStatusTone(payout.status)}`}>
-                          {formatStatus(payout.status)}
-                        </span>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
-      </div>
-
-      <section className="panel">
-        <header className="panel-header">
-          <div>
-            <h2 className="panel-title">Expense breakdown</h2>
-            <p className="panel-subtitle">Top categories based on year-to-date spend.</p>
-          </div>
-        </header>
-        {expenseBreakdown.length === 0 ? (
-          <div className="panel-empty">No expenses recorded yet.</div>
-        ) : (
-          <ul className="finance-breakdown" aria-label="Expense breakdown">
-            {expenseBreakdown.map(entry => (
-              <li key={entry.category} className="finance-breakdown-row">
-                <div className="finance-breakdown-main">
-                  <span className="finance-breakdown-category">{entry.category}</span>
-                  <span className="finance-breakdown-count">
-                    {formatNumber(entry.count)} {entry.count === 1 ? "expense" : "expenses"}
-                  </span>
-                </div>
-                <span className="finance-breakdown-amount">
-                  {formatCurrencyPrecise(entry.total)}
-                </span>
-              </li>
-            ))}
-          </ul>
-        )}
+        ) : null}
       </section>
 
-      <section className="panel">
-        <header className="panel-header">
-          <div>
-            <h2 className="panel-title">Vendor overview</h2>
-            <p className="panel-subtitle">Active relationships and open balances.</p>
-          </div>
-          <div className="finance-vendor-meta">
-            <span>{formatNumber(vendorSummary.activeVendors)} active vendors</span>
-            <span>{formatCurrency(vendorSummary.openBalance)} open balance</span>
-          </div>
+      <section className="finance-actions">
+        <header>
+          <h2>Quick Actions</h2>
         </header>
-        {topVendors.length === 0 ? (
-          <div className="panel-empty">No vendors connected yet.</div>
-        ) : (
-          <ul className="finance-vendors" aria-label="Vendors">
-            {topVendors.map(vendor => (
-              <li key={vendor.id} className="finance-vendor-row">
-                <div className="finance-vendor-main">
-                  <span className="finance-vendor-name">{vendor.name}</span>
-                  <span className="finance-vendor-category">{vendor.category}</span>
-                </div>
-                <div className="finance-vendor-meta">
-                  <span>{formatCurrencyPrecise(vendor.spendYtd)} YTD</span>
-                  <span>{formatCurrencyPrecise(vendor.openBalance)} open</span>
-                  <span className={`status-pill ${vendorStatusTone(vendor.status)}`}>
-                    {formatStatus(vendor.status)}
-                  </span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </section>
-
-      <section className="panel">
-        <header className="panel-header">
-          <div>
-            <h2 className="panel-title">Overdue invoices</h2>
-            <p className="panel-subtitle">Past-due balances that still require follow-up.</p>
-          </div>
-        </header>
-        <div className="table-wrap">
-          <table className="table">
-            <thead>
-              <tr>
-                <th scope="col">Invoice</th>
-                <th scope="col">Client</th>
-                <th scope="col">Due date</th>
-                <th scope="col">Outstanding</th>
-                <th scope="col">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {overdueInvoices.length === 0 ? (
-                <tr>
-                  <td colSpan={5} className="table-empty">
-                    No overdue invoices — great job!
-                  </td>
-                </tr>
-              ) : (
-                overdueInvoices.map(invoice => (
-                  <tr key={invoice.id}>
-                    <td>{invoice.invoiceNumber ?? "Invoice"}</td>
-                    <td>{invoice.clientName ?? "Unknown client"}</td>
-                    <td>{formatDate(invoice.dueOn)}</td>
-                    <td>{formatCurrencyPrecise(remainingInvoiceBalance(invoice))}</td>
-                    <td>
-                      <span className={`status-pill ${invoiceStatusTone(invoice.status)}`}>
-                        {formatStatus(invoice.status)}
-                      </span>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
+        <div className="finance-actions-grid">
+          {quickActions.map(card => (
+            <a key={card.title} className="finance-action-card" href={card.href}>
+              <div className="finance-action-header">
+                <span className="finance-action-title">{card.title}</span>
+                <span className="finance-action-hint">{card.hint}</span>
+              </div>
+              <div className={`finance-action-value ${card.valueTone ?? ""}`}>{card.value}</div>
+              {card.caption ? <p className="finance-action-caption">{card.caption}</p> : null}
+              <span className="finance-action-button">{card.action}</span>
+            </a>
+          ))}
         </div>
       </section>
     </div>
