@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getStaffRoster, type StaffRosterMember } from "./data";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
@@ -89,9 +90,9 @@ export default async function Page() {
             ) : null}
           </div>
           <div className="panel-actions">
-            <button type="button" className="button button-primary">
+            <Link href="/staff/new" className="button button-primary">
               Add staff member
-            </button>
+            </Link>
           </div>
         </header>
         <div className="table-wrap">

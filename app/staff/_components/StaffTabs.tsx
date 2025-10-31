@@ -12,7 +12,7 @@ const tabs = [
 
 function isActive(pathname: string, href: string) {
   if (href === "/staff") {
-    return pathname === href;
+    return pathname === href || pathname.startsWith("/staff/new");
   }
   return pathname === href || pathname.startsWith(`${href}/`);
 }
