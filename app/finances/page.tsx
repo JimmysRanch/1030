@@ -28,6 +28,14 @@ type PercentChange = {
   trend: "up" | "down" | "flat";
 };
 
+type KpiMetric = {
+  title: string;
+  value: string;
+  change: PercentChange;
+  tone: "positive" | "negative";
+  variant?: "money-in";
+};
+
 type ChartGeometry = {
   viewBox: string;
   width: number;
@@ -150,24 +158,25 @@ export default async function Page() {
   const moneyOutChange = calculatePercentChange(currentPeriod.expenses ?? 0, previousPeriod?.expenses ?? 0);
   const moneyLeftChange = calculatePercentChange(currentPeriod.net ?? 0, previousPeriod?.net ?? 0);
 
-  const kpis = [
+  const kpis: KpiMetric[] = [
     {
       title: "Money In (This Month)",
       value: formatCurrencyPrecise(currentPeriod.revenue ?? 0),
       change: moneyInChange,
-      tone: "positive" as const,
+      tone: "positive",
+      variant: "money-in",
     },
     {
       title: "Money Out (This Month)",
       value: formatCurrencyPrecise(currentPeriod.expenses ?? 0),
       change: moneyOutChange,
-      tone: "negative" as const,
+      tone: "negative",
     },
     {
       title: "What's Left (This Month)",
       value: formatCurrencyPrecise(currentPeriod.net ?? 0),
       change: moneyLeftChange,
-      tone: (currentPeriod.net ?? 0) >= 0 ? ("positive" as const) : ("negative" as const),
+      tone: (currentPeriod.net ?? 0) >= 0 ? "positive" : "negative",
     },
   ];
 
@@ -258,7 +267,12 @@ export default async function Page() {
     <div className="finance-page stack gap-large">
       <section className="finance-kpi-grid">
         {kpis.map(metric => (
-          <article key={metric.title} className={`finance-kpi-card tone-${metric.tone}`}>
+          <article
+            key={metric.title}
+            className={`finance-kpi-card tone-${metric.tone}${
+              metric.variant ? ` variant-${metric.variant}` : ""
+            }`}
+          >
             <header className="finance-kpi-header">
               <h2>{metric.title}</h2>
               <span aria-hidden="true" className={`trend-icon ${metric.change.trend}`}>
