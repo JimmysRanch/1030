@@ -33,7 +33,7 @@ type KpiMetric = {
   value: string;
   change: PercentChange;
   tone: "positive" | "negative";
-  variant?: "money-in";
+  variant?: "money-in" | "money-out" | "money-left";
 };
 
 type ChartGeometry = {
@@ -171,12 +171,14 @@ export default async function Page() {
       value: formatCurrencyPrecise(currentPeriod.expenses ?? 0),
       change: moneyOutChange,
       tone: "negative",
+      variant: "money-out",
     },
     {
       title: "What's Left (This Month)",
       value: formatCurrencyPrecise(currentPeriod.net ?? 0),
       change: moneyLeftChange,
       tone: (currentPeriod.net ?? 0) >= 0 ? "positive" : "negative",
+      variant: "money-left",
     },
   ];
 
@@ -325,12 +327,12 @@ export default async function Page() {
             >
               <defs>
                 <linearGradient id="revenueGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(90, 220, 255, 0.4)" />
-                  <stop offset="100%" stopColor="rgba(90, 220, 255, 0.05)" />
+                  <stop offset="0%" stopColor="rgba(73, 163, 255, 0.4)" />
+                  <stop offset="100%" stopColor="rgba(73, 163, 255, 0.05)" />
                 </linearGradient>
                 <linearGradient id="expenseGradient" x1="0" x2="0" y1="0" y2="1">
-                  <stop offset="0%" stopColor="rgba(255, 153, 102, 0.4)" />
-                  <stop offset="100%" stopColor="rgba(255, 153, 102, 0.05)" />
+                  <stop offset="0%" stopColor="rgba(255, 91, 91, 0.4)" />
+                  <stop offset="100%" stopColor="rgba(255, 91, 91, 0.05)" />
                 </linearGradient>
               </defs>
               <line
