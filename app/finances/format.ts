@@ -136,3 +136,88 @@ export function payoutStatusTone(value: string | null | undefined) {
   }
   return "status-neutral";
 }
+
+export function paymentStatusTone(value: string | null | undefined) {
+  if (!value) {
+    return "status-neutral";
+  }
+  const normalized = value.toLowerCase();
+  if (normalized.includes("settled") || normalized.includes("paid") || normalized.includes("completed")) {
+    return "status-active";
+  }
+  if (normalized.includes("pending") || normalized.includes("processing") || normalized.includes("awaiting")) {
+    return "status-onboarding";
+  }
+  if (normalized.includes("failed") || normalized.includes("declined") || normalized.includes("error")) {
+    return "status-leave";
+  }
+  return "status-neutral";
+}
+
+export function payrollStatusTone(value: string | null | undefined) {
+  if (!value) {
+    return "status-neutral";
+  }
+  const normalized = value.toLowerCase();
+  if (normalized.includes("paid") || normalized.includes("processed")) {
+    return "status-active";
+  }
+  if (normalized.includes("scheduled") || normalized.includes("processing")) {
+    return "status-onboarding";
+  }
+  if (normalized.includes("failed") || normalized.includes("hold")) {
+    return "status-leave";
+  }
+  return "status-neutral";
+}
+
+export function taxStatusTone(value: string | null | undefined) {
+  if (!value) {
+    return "status-neutral";
+  }
+  const normalized = value.toLowerCase();
+  if (normalized.includes("filed") || normalized.includes("submitted") || normalized.includes("paid")) {
+    return "status-active";
+  }
+  if (normalized.includes("due") || normalized.includes("awaiting")) {
+    return "status-onboarding";
+  }
+  if (normalized.includes("past due") || normalized.includes("overdue")) {
+    return "status-leave";
+  }
+  return "status-neutral";
+}
+
+export function vendorStatusTone(value: string | null | undefined) {
+  if (!value) {
+    return "status-neutral";
+  }
+  const normalized = value.toLowerCase();
+  if (normalized.includes("active") || normalized.includes("preferred")) {
+    return "status-active";
+  }
+  if (normalized.includes("pending") || normalized.includes("new")) {
+    return "status-onboarding";
+  }
+  if (normalized.includes("hold") || normalized.includes("suspended")) {
+    return "status-leave";
+  }
+  return "status-neutral";
+}
+
+export function purchaseOrderStatusTone(value: string | null | undefined) {
+  if (!value) {
+    return "status-neutral";
+  }
+  const normalized = value.toLowerCase();
+  if (normalized.includes("received") || normalized.includes("approved")) {
+    return "status-active";
+  }
+  if (normalized.includes("awaiting") || normalized.includes("in transit") || normalized.includes("draft")) {
+    return "status-onboarding";
+  }
+  if (normalized.includes("canceled") || normalized.includes("void")) {
+    return "status-leave";
+  }
+  return "status-neutral";
+}

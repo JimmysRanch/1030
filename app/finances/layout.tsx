@@ -7,13 +7,22 @@ export default function FinancesLayout({
 }) {
   return (
     <section className="page finances-page">
-      <header className="page-header">
-        <div>
+      <header className="finances-header">
+        <div className="finances-heading">
+          <span className="finances-eyebrow">Financial center</span>
           <h1>Finances</h1>
           <p className="page-subtitle">
-            Monitor revenue, outstanding balances, payouts, and operating expenses —
-            synced with Supabase in real time.
+            Stay on top of receivables, outgoing spend, payroll, taxes, and vendor partnerships
+            with live data synced from Supabase.
           </p>
+        </div>
+        <div className="finances-actions">
+          <button type="button" className="button button-ghost">
+            Download reports
+          </button>
+          <button type="button" className="button button-primary">
+            Record transaction
+          </button>
         </div>
       </header>
       <FinancesTabs />

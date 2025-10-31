@@ -12,6 +12,8 @@ import {
   invoiceStatusTone,
 } from "../format";
 
+const filterChips = ["All", "Open", "Overdue", "Paid", "Partial"];
+
 function servicesLabel(services: string[], fallback: string | null) {
   if (services.length > 0) {
     return services.slice(0, 3).join(" · ");
@@ -28,13 +30,13 @@ export default async function Page() {
       label: "Total invoiced",
       value: formatCurrency(summary.total),
       accent: "metrics-total",
-      description: `${formatNumber(summary.invoiceCount)} invoices`,
+      description: `${formatNumber(summary.invoiceCount)} invoices issued`,
     },
     {
       label: "Collected",
       value: formatCurrency(summary.collected),
       accent: "metrics-active",
-      description: `${formatNumber(summary.paidCount)} paid`,
+      description: `${formatNumber(summary.paidCount)} paid in full`,
     },
     {
       label: "Outstanding",
@@ -50,6 +52,8 @@ export default async function Page() {
     },
   ];
 
+  const overdueShare = summary.total ? (summary.outstanding / summary.total) * 100 : 0;
+
   return (
     <div className="stack gap-large">
       <section className="metrics-grid">
@@ -62,13 +66,44 @@ export default async function Page() {
         ))}
       </section>
 
+      <section className="panel finance-spotlight">
+        <div className="finance-spotlight-body">
+          <h2>Collections spotlight</h2>
+          <p>
+            You have {formatNumber(summary.openCount)} open invoices with {formatCurrencyPrecise(summary.outstanding)} still
+            outstanding. Keep the momentum going by nudging overdue clients.
+          </p>
+          <div className="finance-progress">
+            <div className="progress-bar">
+              <span className="progress-bar-fill" style={{ width: `${Math.min(100, overdueShare)}%` }} />
+            </div>
+            <span className="finance-progress-caption">
+              {formatCurrencyPrecise(summary.outstanding)} overdue ({overdueShare.toFixed(0)}% of total)
+            </span>
+          </div>
+        </div>
+        <div className="finance-spotlight-actions">
+          <a className="button button-primary" href="/finances/payments">
+            Record payment
+          </a>
+          <a className="button button-ghost" href="/finances/invoices">
+            Send reminder
+          </a>
+        </div>
+      </section>
+
       <section className="panel">
         <header className="panel-header">
           <div>
             <h2 className="panel-title">Invoice ledger</h2>
-            <p className="panel-subtitle">
-              Full detail for every invoice synced from Supabase.
-            </p>
+            <p className="panel-subtitle">Full detail for every invoice synced from Supabase.</p>
+          </div>
+          <div className="finance-filter-chips">
+            {filterChips.map(chip => (
+              <span key={chip} className={`chip ${chip === "All" ? "chip-active" : ""}`}>
+                {chip}
+              </span>
+            ))}
           </div>
         </header>
         <div className="table-wrap">
@@ -97,7 +132,12 @@ export default async function Page() {
                 invoices.map(invoice => (
                   <tr key={invoice.id}>
                     <td>{invoice.invoiceNumber ?? "Invoice"}</td>
-                    <td>{invoice.clientName ?? "Unknown client"}</td>
+                    <td>
+                      <div className="row-copy">
+                        <span className="row-primary">{invoice.clientName ?? "Unknown client"}</span>
+                        <span className="row-secondary">{invoice.petName ?? "—"}</span>
+                      </div>
+                    </td>
                     <td>{servicesLabel(invoice.services, invoice.petName)}</td>
                     <td>{formatDate(invoice.issuedOn)}</td>
                     <td>{formatDate(invoice.dueOn)}</td>
@@ -108,7 +148,20 @@ export default async function Page() {
                         {formatStatus(invoice.status)}
                       </span>
                     </td>
-                    <td>{invoice.paymentMethod ?? "—"}</td>
+                    <td>
+                      <div className="row-copy">
+                        <span className="row-primary">{invoice.paymentMethod ?? "—"}</span>
+                        {invoice.tags.length > 0 ? (
+                          <span className="chip-list">
+                            {invoice.tags.slice(0, 3).map(tag => (
+                              <span key={tag} className="chip">
+                                {tag}
+                              </span>
+                            ))}
+                          </span>
+                        ) : null}
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
