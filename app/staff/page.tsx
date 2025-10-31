@@ -84,9 +84,9 @@ export default async function Page() {
         <header className="panel-header">
           <div>
             <h2 className="panel-title">Staff</h2>
-            <p className="panel-subtitle">
-              {summary.total ? `${summary.total} team members` : "No team members"}
-            </p>
+            {summary.total ? (
+              <p className="panel-subtitle">{`${summary.total} team members`}</p>
+            ) : null}
           </div>
           <div className="panel-actions">
             <button type="button" className="button button-primary">
