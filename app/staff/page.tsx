@@ -1,8 +1,5 @@
-import {
-  getStaffRoster,
-  type StaffRosterMember,
-  type StaffRosterSummary,
-} from "./data";
+import Link from "next/link";
+import { getStaffRoster, type StaffRosterMember } from "./data";
 
 const dateFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
@@ -14,8 +11,6 @@ const longDateFormatter = new Intl.DateTimeFormat("en-US", {
   day: "numeric",
   year: "numeric",
 });
-
-const numberFormatter = new Intl.NumberFormat("en-US");
 
 function formatDate(value: string | null) {
   if (!value) {
@@ -77,35 +72,6 @@ function statusTone(status: string | null) {
   return "status-neutral";
 }
 
-function rosterMetrics(summary: StaffRosterSummary) {
-  return [
-    {
-      label: "Total team",
-      value: numberFormatter.format(summary.total),
-      accent: "metrics-total",
-      description: "All active, on-leave, and onboarding staff",
-    },
-    {
-      label: "Active",
-      value: numberFormatter.format(summary.active),
-      accent: "metrics-active",
-      description: "Currently scheduled and available",
-    },
-    {
-      label: "On leave",
-      value: numberFormatter.format(summary.onLeave),
-      accent: "metrics-leave",
-      description: "Approved PTO, LOA, or inactive",
-    },
-    {
-      label: "Onboarding",
-      value: numberFormatter.format(summary.onboarding),
-      accent: "metrics-onboarding",
-      description: "Training and shadowing staff",
-    },
-  ];
-}
-
 function formatStatus(status: string | null) {
   return status ? status.replace(/\b\w/g, char => char.toUpperCase()) : "Unknown";
 }
@@ -113,27 +79,20 @@ function formatStatus(status: string | null) {
 export default async function Page() {
   const { staff, summary } = await getStaffRoster();
 
-  const metrics = rosterMetrics(summary);
-
   return (
     <div className="stack gap-large">
-      <section className="metrics-grid">
-        {metrics.map(metric => (
-          <article key={metric.label} className={`metrics-card ${metric.accent}`}>
-            <header className="metrics-label">{metric.label}</header>
-            <div className="metrics-value">{metric.value}</div>
-            <p className="metrics-description">{metric.description}</p>
-          </article>
-        ))}
-      </section>
-
       <section className="panel">
         <header className="panel-header">
           <div>
-            <h2 className="panel-title">Roster</h2>
-            <p className="panel-subtitle">
-              {summary.total ? `${summary.total} team members` : "No team members"}
-            </p>
+            <h2 className="panel-title">Staff</h2>
+            {summary.total ? (
+              <p className="panel-subtitle">{`${summary.total} team members`}</p>
+            ) : null}
+          </div>
+          <div className="panel-actions">
+            <Link href="/staff/new" className="button button-primary">
+              Add staff member
+            </Link>
           </div>
         </header>
         <div className="table-wrap">
