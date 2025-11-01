@@ -107,6 +107,135 @@ export type ChecklistItem = {
   completed: boolean;
 };
 
+const MOCK_ROSTER: StaffRosterMember[] = [
+  {
+    id: "mock-amelia-chen",
+    name: "Amelia Chen",
+    role: "Lead Stylist",
+    status: "active",
+    location: "Downtown Studio",
+    email: "amelia.chen@example.com",
+    phone: "(415) 555-1020",
+    photoUrl: null,
+    specialties: ["Balayage", "Creative Color"],
+    certifications: [
+      {
+        name: "Cosmetology License",
+        status: "active",
+        expiresOn: "2025-08-14T00:00:00.000Z",
+      },
+    ],
+    startDate: "2019-03-04T00:00:00.000Z",
+    lastShiftAt: "2024-06-14T22:00:00.000Z",
+    nextShiftAt: "2024-06-18T15:00:00.000Z",
+    clientsCount: 68,
+    utilization: 0.92,
+    rating: 4.9,
+  },
+  {
+    id: "mock-marcus-hill",
+    name: "Marcus Hill",
+    role: "Barber",
+    status: "active",
+    location: "Midtown Shop",
+    email: "marcus.hill@example.com",
+    phone: "(415) 555-3344",
+    photoUrl: null,
+    specialties: ["Fades", "Beard Design"],
+    certifications: [],
+    startDate: "2021-07-19T00:00:00.000Z",
+    lastShiftAt: "2024-06-16T00:00:00.000Z",
+    nextShiftAt: "2024-06-19T16:30:00.000Z",
+    clientsCount: 42,
+    utilization: 0.81,
+    rating: 4.7,
+  },
+  {
+    id: "mock-lena-garcia",
+    name: "Lena Garcia",
+    role: "Esthetician",
+    status: "onboarding",
+    location: "Uptown Spa",
+    email: "lena.garcia@example.com",
+    phone: "(415) 555-8899",
+    photoUrl: null,
+    specialties: ["Hydrafacial", "Brow Shaping"],
+    certifications: [
+      {
+        name: "Esthetics License",
+        status: "pending",
+        expiresOn: null,
+      },
+    ],
+    startDate: "2024-05-06T00:00:00.000Z",
+    lastShiftAt: null,
+    nextShiftAt: "2024-06-20T17:00:00.000Z",
+    clientsCount: 5,
+    utilization: 0.34,
+    rating: null,
+  },
+  {
+    id: "mock-khalil-bryant",
+    name: "Khalil Bryant",
+    role: "Massage Therapist",
+    status: "on leave",
+    location: "Uptown Spa",
+    email: "khalil.bryant@example.com",
+    phone: "(415) 555-2211",
+    photoUrl: null,
+    specialties: ["Sports Massage", "Deep Tissue"],
+    certifications: [
+      {
+        name: "CPR/AED",
+        status: "active",
+        expiresOn: "2026-01-01T00:00:00.000Z",
+      },
+    ],
+    startDate: "2018-11-12T00:00:00.000Z",
+    lastShiftAt: "2024-05-28T21:00:00.000Z",
+    nextShiftAt: null,
+    clientsCount: 51,
+    utilization: 0.73,
+    rating: 4.6,
+  },
+  {
+    id: "mock-sofia-rivers",
+    name: "Sofia Rivers",
+    role: "Salon Coordinator",
+    status: "active",
+    location: "Front Desk",
+    email: "sofia.rivers@example.com",
+    phone: "(415) 555-7788",
+    photoUrl: null,
+    specialties: ["Client Relations", "Scheduling"],
+    certifications: [],
+    startDate: "2020-02-10T00:00:00.000Z",
+    lastShiftAt: "2024-06-15T01:00:00.000Z",
+    nextShiftAt: "2024-06-18T14:00:00.000Z",
+    clientsCount: 0,
+    utilization: 0.88,
+    rating: 4.8,
+  },
+  {
+    id: "mock-noah-patel",
+    name: "Noah Patel",
+    role: "Assistant Stylist",
+    status: "training",
+    location: "Downtown Studio",
+    email: "noah.patel@example.com",
+    phone: "(415) 555-6677",
+    photoUrl: null,
+    specialties: ["Blowouts", "Color Prep"],
+    certifications: [],
+    startDate: "2023-09-25T00:00:00.000Z",
+    lastShiftAt: "2024-06-13T23:00:00.000Z",
+    nextShiftAt: "2024-06-18T18:00:00.000Z",
+    clientsCount: 24,
+    utilization: 0.56,
+    rating: 4.5,
+  },
+];
+
 const EMPTY_ROSTER_SUMMARY: StaffRosterSummary = {
   total: 0,
   active: 0,
@@ -120,14 +249,14 @@ export async function getStaffRoster(): Promise<{
 }> {
   const client = getSupabaseClient();
   if (!client) {
-    return { staff: [], summary: EMPTY_ROSTER_SUMMARY };
+    return { staff: MOCK_ROSTER, summary: buildRosterSummary(MOCK_ROSTER) };
   }
 
   const { data, error } = await client.from(TABLES.roster).select("*");
 
   if (error || !Array.isArray(data)) {
     console.error("Failed to load staff roster", error);
-    return { staff: [], summary: EMPTY_ROSTER_SUMMARY };
+    return { staff: MOCK_ROSTER, summary: buildRosterSummary(MOCK_ROSTER) };
   }
 
   const staff = data.map(mapRosterMember).sort(sortByName);
