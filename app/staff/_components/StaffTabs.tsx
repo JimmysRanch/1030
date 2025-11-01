@@ -4,17 +4,27 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const tabs = [
-  { href: "/staff", label: "Roster" },
+  { href: "/staff", label: "Staff" },
   { href: "/staff/schedule", label: "Scheduling" },
   { href: "/staff/payroll", label: "Payroll" },
   { href: "/staff/performance", label: "Performance" },
-  { href: "/staff/onboarding", label: "Onboarding" },
 ];
+
+const nestedStaffRoutes = ["/staff/schedule", "/staff/payroll", "/staff/performance"];
 
 function isActive(pathname: string, href: string) {
   if (href === "/staff") {
-    return pathname === href;
+    if (pathname === href) {
+      return true;
+    }
+
+    if (!pathname.startsWith("/staff")) {
+      return false;
+    }
+
+    return !nestedStaffRoutes.some(route => pathname.startsWith(route));
   }
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 

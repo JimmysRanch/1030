@@ -21,15 +21,20 @@ export default function Nav() {
     <header className="top-nav">
       <div className="nav-spacer" aria-hidden="true" />
       <nav className="primary-nav" aria-label="Primary">
-        {items.map(it => (
-          <Link
-            key={it.href}
-            href={it.href}
-            className={`nav-link ${path === it.href ? "active" : ""}`}
-          >
-            {it.label}
-          </Link>
-        ))}
+        {items.map(it => {
+          const isActive =
+            path === it.href || (path.startsWith(`${it.href}/`) && it.href !== "/");
+
+          return (
+            <Link
+              key={it.href}
+              href={it.href}
+              className={`nav-link ${isActive ? "active" : ""}`}
+            >
+              {it.label}
+            </Link>
+          );
+        })}
       </nav>
       <div className="top-actions">
         <div className="user-pill">
