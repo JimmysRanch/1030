@@ -1,8 +1,5 @@
-export default function Page() {
-  return (
-    <section>
-      <h1>Clients</h1>
-      <p>This page runs without a backend.</p>
-    </section>
-  );
+import { redirect } from "next/navigation";
+
+export default function CustomersRedirectPage() {
+  redirect("/customers/pets");
 }
