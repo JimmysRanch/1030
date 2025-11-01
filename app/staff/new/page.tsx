@@ -173,125 +173,116 @@ export default function NewStaffPage() {
               <h2>Compensation</h2>
               <p>Configure how this staff member earns and receives payouts.</p>
             </header>
-            <div className="form-stack">
-              <div className="form-row">
-                <div className="form-row-main">
-                  <div className="form-row-copy">
-                    <h3>Commission on personal grooms</h3>
-                    <p>Pay this team member when their personal clientele returns.</p>
-                  </div>
-                  <div className="form-row-actions">
-                    <label className="toggle-switch">
-                      <input id="personalCommission" name="personalCommission" type="checkbox" defaultChecked />
-                      <span className="toggle-slider" aria-hidden="true" />
-                    </label>
-                    <div className="form-field form-field-inline">
-                      <label htmlFor="personalRate">Rate</label>
-                      <input id="personalRate" name="personalRate" type="number" min="0" max="100" step="1" placeholder="35" />
-                      <span className="form-field-suffix">%</span>
-                    </div>
+            <div className="compensation-card">
+              <div className="compensation-header">
+                <span>Compensation type</span>
+                <span>Status</span>
+                <span>Rate / Amount</span>
+              </div>
+
+              <div className="compensation-row">
+                <div className="compensation-info">
+                  <h3>Commission on personal grooms</h3>
+                  <p>Pay this team member when their personal clientele returns.</p>
+                </div>
+                <div className="compensation-toggle">
+                  <label className="toggle-switch">
+                    <input id="personalCommission" name="personalCommission" type="checkbox" defaultChecked />
+                    <span className="toggle-slider" aria-hidden="true" />
+                  </label>
+                </div>
+                <div className="compensation-input">
+                  <div className="form-field form-field-inline">
+                    <label htmlFor="personalRate">Rate</label>
+                    <input id="personalRate" name="personalRate" type="number" min="0" max="100" step="1" placeholder="35" />
+                    <span className="form-field-suffix">%</span>
                   </div>
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-row-main">
-                  <div className="form-row-copy">
-                    <h3>Hourly pay</h3>
-                    <p>Compensate for time spent on-site or assisting other groomers.</p>
-                  </div>
-                  <div className="form-row-actions">
-                    <label className="toggle-switch">
-                      <input id="hourlyPay" name="hourlyPay" type="checkbox" defaultChecked />
-                      <span className="toggle-slider" aria-hidden="true" />
-                    </label>
-                    <div className="form-field form-field-inline">
-                      <label htmlFor="hourlyRate">Rate</label>
-                      <input
-                        id="hourlyRate"
-                        name="hourlyRate"
-                        type="number"
-                        min="0"
-                        step="0.5"
-                        placeholder="22.50"
-                      />
-                      <span className="form-field-suffix">/hr</span>
-                    </div>
+              <div className="compensation-row">
+                <div className="compensation-info">
+                  <h3>Hourly pay</h3>
+                  <p>Compensate for time spent on-site or assisting other groomers.</p>
+                </div>
+                <div className="compensation-toggle">
+                  <label className="toggle-switch">
+                    <input id="hourlyPay" name="hourlyPay" type="checkbox" defaultChecked />
+                    <span className="toggle-slider" aria-hidden="true" />
+                  </label>
+                </div>
+                <div className="compensation-input">
+                  <div className="form-field form-field-inline">
+                    <label htmlFor="hourlyRate">Rate</label>
+                    <input id="hourlyRate" name="hourlyRate" type="number" min="0" step="0.5" placeholder="22.50" />
+                    <span className="form-field-suffix">/hr</span>
                   </div>
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-row-main">
-                  <div className="form-row-copy">
-                    <h3>Salary</h3>
-                    <p>Provide a fixed monthly amount for leadership roles or managers.</p>
-                  </div>
-                  <div className="form-row-actions">
-                    <label className="toggle-switch">
-                      <input id="salary" name="salary" type="checkbox" />
-                      <span className="toggle-slider" aria-hidden="true" />
-                    </label>
-                    <div className="form-field form-field-inline">
-                      <label htmlFor="salaryAmount">Amount</label>
-                      <input id="salaryAmount" name="salaryAmount" type="number" min="0" step="100" placeholder="4000" />
-                      <span className="form-field-suffix">/mo</span>
-                    </div>
+              <div className="compensation-row">
+                <div className="compensation-info">
+                  <h3>Salary</h3>
+                  <p>Provide a fixed monthly amount for leadership roles or managers.</p>
+                </div>
+                <div className="compensation-toggle">
+                  <label className="toggle-switch">
+                    <input id="salary" name="salary" type="checkbox" />
+                    <span className="toggle-slider" aria-hidden="true" />
+                  </label>
+                </div>
+                <div className="compensation-input">
+                  <div className="form-field form-field-inline">
+                    <label htmlFor="salaryAmount">Amount</label>
+                    <input id="salaryAmount" name="salaryAmount" type="number" min="0" step="100" placeholder="4000" />
+                    <span className="form-field-suffix">/mo</span>
                   </div>
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-row-main">
-                  <div className="form-row-copy">
-                    <h3>Weekly guarantee vs. commission</h3>
-                    <p>The higher value wins: guarantee the commission or whichever amount is higher.</p>
-                  </div>
-                  <div className="form-row-actions">
-                    <label className="toggle-switch">
-                      <input id="weeklyGuarantee" name="weeklyGuarantee" type="checkbox" />
-                      <span className="toggle-slider" aria-hidden="true" />
-                    </label>
-                    <div className="form-field form-field-inline">
-                      <label htmlFor="weeklyGuaranteeAmount">Guarantee</label>
-                      <input
-                        id="weeklyGuaranteeAmount"
-                        name="weeklyGuaranteeAmount"
-                        type="number"
-                        min="0"
-                        step="10"
-                        placeholder="900"
-                      />
-                      <span className="form-field-suffix">/wk</span>
-                    </div>
+              <div className="compensation-row">
+                <div className="compensation-info">
+                  <h3>Weekly guarantee vs. commission</h3>
+                  <p>The higher value wins: guarantee the commission or whichever amount is higher.</p>
+                </div>
+                <div className="compensation-toggle">
+                  <label className="toggle-switch">
+                    <input id="weeklyGuarantee" name="weeklyGuarantee" type="checkbox" />
+                    <span className="toggle-slider" aria-hidden="true" />
+                  </label>
+                </div>
+                <div className="compensation-input">
+                  <div className="form-field form-field-inline">
+                    <label htmlFor="weeklyGuaranteeAmount">Guarantee</label>
+                    <input
+                      id="weeklyGuaranteeAmount"
+                      name="weeklyGuaranteeAmount"
+                      type="number"
+                      min="0"
+                      step="10"
+                      placeholder="900"
+                    />
+                    <span className="form-field-suffix">/wk</span>
                   </div>
                 </div>
               </div>
 
-              <div className="form-row">
-                <div className="form-row-main">
-                  <div className="form-row-copy">
-                    <h3>Team overrides</h3>
-                    <p>Earn additional commission when the team hits location goals.</p>
-                  </div>
-                  <div className="form-row-actions">
-                    <label className="toggle-switch">
-                      <input id="teamOverrides" name="teamOverrides" type="checkbox" />
-                      <span className="toggle-slider" aria-hidden="true" />
-                    </label>
-                    <div className="form-field form-field-inline">
-                      <label htmlFor="teamOverrideRate">Rate</label>
-                      <input
-                        id="teamOverrideRate"
-                        name="teamOverrideRate"
-                        type="number"
-                        min="0"
-                        max="100"
-                        step="1"
-                        placeholder="5"
-                      />
-                      <span className="form-field-suffix">%</span>
-                    </div>
+              <div className="compensation-row">
+                <div className="compensation-info">
+                  <h3>Team overrides</h3>
+                  <p>Earn additional commission when the team hits location goals.</p>
+                </div>
+                <div className="compensation-toggle">
+                  <label className="toggle-switch">
+                    <input id="teamOverrides" name="teamOverrides" type="checkbox" />
+                    <span className="toggle-slider" aria-hidden="true" />
+                  </label>
+                </div>
+                <div className="compensation-input">
+                  <div className="form-field form-field-inline">
+                    <label htmlFor="teamOverrideRate">Rate</label>
+                    <input id="teamOverrideRate" name="teamOverrideRate" type="number" min="0" max="100" step="1" placeholder="5" />
+                    <span className="form-field-suffix">%</span>
                   </div>
                 </div>
               </div>
