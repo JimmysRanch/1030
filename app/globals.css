@@ -731,83 +731,20 @@ button { font: inherit; color: inherit; }
 }
 
 .referral-group {
-  gap:12px;
-}
-
-.referral-options {
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-}
-
-.referral-options label {
-  display:inline-flex;
-  align-items:center;
-  gap:6px;
-  padding:8px 12px;
-  border-radius:999px;
-  border:1px solid rgba(78,161,255,0.25);
-  background:rgba(12,16,26,0.7);
-  cursor:pointer;
-  transition:background 0.2s ease, border-color 0.2s ease;
-}
-
-.referral-options input {
-  accent-color:#7ec2ff;
-}
-
-.referral-options label:hover {
-  border-color:rgba(126,194,255,0.8);
-  background:rgba(20,30,46,0.8);
+  gap:8px;
 }
 
 .referral-other input {
   width:100%;
-  padding:10px 12px;
-  border-radius:10px;
+  padding:12px 14px;
+  border-radius:12px;
   border:1px solid rgba(78,161,255,0.22);
   background:rgba(12,16,26,0.85);
   color:#f2f5ff;
   font-size:14px;
 }
 
-.toggle-group {
-  display:inline-flex;
-  gap:8px;
-}
 
-.toggle-group label {
-  position:relative;
-  display:inline-flex;
-  cursor:pointer;
-}
-
-.toggle-group label span {
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:6px;
-  padding:8px 16px;
-  border-radius:999px;
-  border:1px solid rgba(78,161,255,0.2);
-  background:rgba(10,16,26,0.8);
-  color:#cfe4ff;
-  font-size:13px;
-  transition:border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
-}
-
-.toggle-group input {
-  appearance:none;
-  width:0;
-  height:0;
-  position:absolute;
-}
-
-.toggle-group input:checked + span {
-  border-color:rgba(78,161,255,0.6);
-  background:rgba(78,161,255,0.2);
-  color:#041020;
-}
 
 .form-footer {
   display:flex;

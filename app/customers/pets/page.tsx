@@ -60,12 +60,12 @@ function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => voi
       <div
         role="dialog"
         aria-modal="true"
-        aria-labelledby="add-client-heading"
+        aria-labelledby="new-client-heading"
         className="dialog"
         onClick={event => event.stopPropagation()}
       >
         <header className="dialog-header">
-          <h2 id="add-client-heading">Add Client</h2>
+          <h2 id="new-client-heading">New Client</h2>
           <button type="button" className="icon-button" aria-label="Close" onClick={onClose}>
             ×
           </button>
@@ -110,45 +110,40 @@ function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => voi
               </label>
             </div>
             <div className="form-grid">
-              <div className="form-field-group form-span-2 referral-group">
+              <label className="form-span-2 referral-group">
                 <span>How did you hear about us?</span>
-                <div className="toggle-group referral-options">
-                  {[
-                    { label: "Facebook", value: "facebook" },
-                    { label: "Google", value: "google" },
-                    { label: "Nextdoor", value: "nextdoor" },
-                    { label: "A friend", value: "friend" },
-                    { label: "Other", value: "other" },
-                  ].map(option => (
-                    <label key={option.value}>
-                      <input
-                        type="radio"
-                        name="referral-source"
-                        value={option.value}
-                        checked={referralSource === option.value}
-                        onChange={event => {
-                          const value = event.target.value;
-                          setReferralSource(value);
-                          if (value !== "other") {
-                            setReferralOther("");
-                          }
-                        }}
-                      />
-                      <span>{option.label}</span>
-                    </label>
-                  ))}
-                </div>
-                {referralSource === "other" ? (
-                  <label className="referral-other">
-                    <span className="sr-only">Custom referral source</span>
-                    <input
-                      placeholder="Let us know where you heard about us"
-                      value={referralOther}
-                      onChange={event => setReferralOther(event.target.value)}
-                    />
-                  </label>
-                ) : null}
-              </div>
+                <select
+                  value={referralSource}
+                  onChange={event => {
+                    const value = event.target.value;
+                    setReferralSource(value);
+                    if (value !== "other") {
+                      setReferralOther("");
+                    }
+                  }}
+                  required
+                >
+                  <option value="" disabled hidden>
+                    Select a source
+                  </option>
+                  <option value="facebook">Facebook</option>
+                  <option value="google">Google</option>
+                  <option value="nextdoor">Nextdoor</option>
+                  <option value="friend">A friend</option>
+                  <option value="other">Other</option>
+                </select>
+              </label>
+              {referralSource === "other" ? (
+                <label className="form-span-2 referral-other">
+                  <span>Tell us more</span>
+                  <input
+                    placeholder="Let us know where you heard about us"
+                    value={referralOther}
+                    onChange={event => setReferralOther(event.target.value)}
+                    required
+                  />
+                </label>
+              ) : null}
             </div>
           </section>
 
@@ -176,36 +171,30 @@ function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => voi
                     <option value="giant">Giant</option>
                   </select>
                 </label>
-                <div className="form-field-group">
+                <label>
                   <span>Gender</span>
-                  <div className="toggle-group">
-                    <label>
-                      <input type="radio" name={`pet-${sectionId}-gender`} value="female" />
-                      <span>Female</span>
-                    </label>
-                    <label>
-                      <input type="radio" name={`pet-${sectionId}-gender`} value="male" />
-                      <span>Male</span>
-                    </label>
-                  </div>
-                </div>
+                  <select defaultValue="">
+                    <option value="" disabled>
+                      Select gender
+                    </option>
+                    <option value="female">Female</option>
+                    <option value="male">Male</option>
+                  </select>
+                </label>
                 <label>
                   <span>Breed</span>
                   <input placeholder="Enter breed" />
                 </label>
-                <div className="form-field-group">
+                <label>
                   <span>Mixed Breed</span>
-                  <div className="toggle-group">
-                    <label>
-                      <input type="radio" name={`pet-${sectionId}-mixed`} value="yes" />
-                      <span>Yes</span>
-                    </label>
-                    <label>
-                      <input type="radio" name={`pet-${sectionId}-mixed`} value="no" defaultChecked />
-                      <span>No</span>
-                    </label>
-                  </div>
-                </div>
+                  <select defaultValue="">
+                    <option value="" disabled>
+                      Select option
+                    </option>
+                    <option value="yes">Yes</option>
+                    <option value="no">No</option>
+                  </select>
+                </label>
                 <label className="form-span-2">
                   <span>Medical, Allergies, and Behavior Information</span>
                   <textarea placeholder="Special instructions, temperament, etc." rows={4} />
@@ -216,14 +205,14 @@ function ClientFormDialog({ open, onClose }: { open: boolean; onClose: () => voi
 
           <footer className="form-footer">
             <button type="button" className="secondary-button" onClick={handleAddPet}>
-              Add Pet
+              Add Additional Pet
             </button>
             <div className="form-footer-actions">
               <button type="button" className="link-button" onClick={onClose}>
                 Cancel
               </button>
               <button type="submit" className="primary-button">
-                Add Client
+                Create New Client
               </button>
             </div>
           </footer>
@@ -292,7 +281,7 @@ export default function ClientsAndPetsPage() {
               ) : null}
             </label>
             <button type="button" className="primary-button" onClick={() => setFormOpen(true)}>
-              Add Client
+              New Client
             </button>
           </div>
 
