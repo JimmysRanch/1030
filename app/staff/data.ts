@@ -265,6 +265,13 @@ export async function getStaffRoster(): Promise<{
   return { staff, summary };
 }
 
+export async function getStaffMember(
+  id: string
+): Promise<StaffRosterMember | null> {
+  const { staff } = await getStaffRoster();
+  return staff.find(member => member.id === id) ?? null;
+}
+
 export async function getStaffSchedule(): Promise<StaffShift[]> {
   const client = getSupabaseClient();
   if (!client) {

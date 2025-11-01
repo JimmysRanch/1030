@@ -10,10 +10,21 @@ const tabs = [
   { href: "/staff/performance", label: "Performance" },
 ];
 
+const nestedStaffRoutes = ["/staff/schedule", "/staff/payroll", "/staff/performance"];
+
 function isActive(pathname: string, href: string) {
   if (href === "/staff") {
-    return pathname === href || pathname.startsWith("/staff/new");
+    if (pathname === href) {
+      return true;
+    }
+
+    if (!pathname.startsWith("/staff")) {
+      return false;
+    }
+
+    return !nestedStaffRoutes.some(route => pathname.startsWith(route));
   }
+
   return pathname === href || pathname.startsWith(`${href}/`);
 }
 
